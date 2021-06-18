@@ -1,5 +1,18 @@
 {
-  "version": "0.0.0",
+  "name": "g-music-visualizer",
+  "version": "1.0.0",
+  "description": "Awesome music visualizer mode",
+  "author": {
+    "name": "leon-kfd",
+    "email": "kfd_personal@163.com"
+  },
+  "keywords": [
+    "music visualizer",
+    "react",
+    "g",
+    "d3"
+  ],
+  "licence": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
