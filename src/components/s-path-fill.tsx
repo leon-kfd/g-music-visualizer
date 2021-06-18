@@ -1,22 +1,21 @@
 import React, { useEffect, useRef } from "react";
 import { Canvas, IShape } from '@antv/g-canvas';
-import { formatToTransit } from '../utils'
+import { formatToTransit, addColorOpacity } from '../utils'
 import { line, curveCardinalClosed } from 'd3'
-interface SPathProps {
+interface SPathFillProps {
   data?: Uint8Array;
   freshTime?: number;
 }
 
-export default function SPath(props: SPathProps) {
+export default function SLine(props: SPathFillProps) {
   const POINT_NUM = 64
   const X = 200
   const Y = 200
   const R = 100
-  const OFFSET = 10
-  const COLORS = ['#e9dcf7', '#cdd9f5', '#cdf5dd', '#f3dfbb']
+  const COLORS = ['#cdf5dd', '#e8fdc8', '#dafcf0', '#f3f8c9']
 
   const canvas = useRef<Canvas>()
-  const sPathArr = useRef<IShape[]>([])
+  const SPathFillArr = useRef<IShape[]>([])
 
   function getArray(arr: Uint8Array) {
     let _arr: number[] = [];
@@ -32,7 +31,7 @@ export default function SPath(props: SPathProps) {
     const deg = index * (360 / POINT_NUM) - 150;
     const l = Math.cos(deg * Math.PI / 180)
     const t = Math.sin(deg * Math.PI / 180)
-    const r = R + OFFSET + addHeight
+    const r = R + addHeight
     return [X + l * r, Y + t * r]
   }
 
@@ -40,11 +39,11 @@ export default function SPath(props: SPathProps) {
     if (props.data) {
       const pathArr: any[] = [[],[],[],[]]
       getArray(props.data).map((item,index) => {
-        pathArr[index % 4].push(getPointByIndex(index, item * item / 65025 * 50 + 4))
+        pathArr[index % 4].push(getPointByIndex(index, item * item / 65025 * 30))
       })
       pathArr.map((item,index) => {
         const path = line().x((d: [number,number]) => d[0]).y((d: [number, number]) => d[1]).curve(curveCardinalClosed)(item)
-        sPathArr.current[index].attr('path', path)
+        SPathFillArr.current[index].attr('path', path)
       })
     }
   }, [
@@ -53,7 +52,7 @@ export default function SPath(props: SPathProps) {
 
   useEffect(() => {
     canvas.current = new Canvas({
-      container: 'SPath',
+      container: 'SPathFill',
       width: 400,
       height: 400,
     });
@@ -67,27 +66,28 @@ export default function SPath(props: SPathProps) {
         shadowColor: COLORS[0],
         shadowBlur: 10
       }
-    });
+    }).setZIndex(2);
 
     const PointArr = Array.from({ length: POINT_NUM / 4 }, (item, index: number) => {
       return getPointByIndex(index * 4)
     })
     const path = line().x((d: [number,number]) => d[0]).y((d: [number, number]) => d[1]).curve(curveCardinalClosed)(PointArr)
     Array.from({ length: 4 }, (item, index: number) => {
-      sPathArr.current.push((canvas.current as Canvas).addShape('path', {
+      SPathFillArr.current.push((canvas.current as Canvas).addShape('path', {
         attrs: {
           stroke: COLORS[index],
           lineWidth: 1,
-          path
+          path,
+          fill: addColorOpacity(COLORS[index], .4)
         }
-      }))
+      }).setZIndex(1))
     })
     
   }, [])
 
   return (
     <div className="s-model">
-      <div id="SPath" className="s-canvas-wrapper"></div>
+      <div id="SPathFill" className="s-canvas-wrapper"></div>
     </div>
   )
 }

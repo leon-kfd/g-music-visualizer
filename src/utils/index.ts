@@ -10,3 +10,20 @@ export function formatToTransit(arr: number[], num = 5, rate = 0.8) {
     return ~~result
   })
 }
+
+export function addColorOpacity(color: string, opacity: number) {
+  if (color[0] === '#') {
+    color = color.slice(1);
+  }
+  const num = parseInt(color, 16);
+  const r = num >> 16
+  const g = num & 0x0000FF
+  const b = (num >> 8) & 0x00FF
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`
+}
+
+export function getCirclePath(cx: number, cy: number, r: number) {
+  return `M ${cx - r}, ${cy}
+  a ${r}, ${r} 0 1, 0 ${r * 2}, 0 
+  a ${r}, ${r} 0 1, 0 ${-r * 2}, 0`
+}

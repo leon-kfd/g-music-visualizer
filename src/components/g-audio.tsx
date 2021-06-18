@@ -2,8 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { MusicVisualizer } from '../plugins/MusicVisualizer'
 import Modules from './g-audio.module.scss'
 import SLine from './s-line'
-import SDot from './s-dot'
+// import SDot from './s-dot'
 import SPath from './s-path'
+import SPathDot from './s-path-dot'
+import SPathFill from './s-path-fill'
+import SCircle from './s-circle'
 
 export const MusicVisualizerCtx = new MusicVisualizer()
 export default function GAudio() {
@@ -15,6 +18,7 @@ export default function GAudio() {
   const [audioURL, setAudioURL] = useState<string>()
   const [audioData, setAudioData] = useState<Uint8Array>()
   const [freshTime, setFreshTime] = useState<number>(+new Date())
+  const [isPlaying, setIsPlaying] = useState(false)
 
   let lastTime: number
   let raf = useRef<number>()
@@ -29,9 +33,11 @@ export default function GAudio() {
     raf.current = requestAnimationFrame(step)
   }
   function play () {
+    setIsPlaying(true)
     raf.current = requestAnimationFrame(step)
   }
   function pause() {
+    setIsPlaying(false)
     raf.current && cancelAnimationFrame(raf.current)
   }
 
@@ -54,8 +60,11 @@ export default function GAudio() {
       </div>
       <div className={Modules.wrapper}>
         <SLine data={audioData} freshTime={freshTime} />
-        <SDot data={audioData} freshTime={freshTime} />
+        {/* <SDot data={audioData} freshTime={freshTime} /> // 不够平滑，弃用 */}
+        <SPathDot data={audioData} freshTime={freshTime} />
         <SPath data={audioData} freshTime={freshTime} />
+        <SPathFill data={audioData} freshTime={freshTime} />
+        <SCircle isPlaying={isPlaying}/>
       </div>
     </>
   )

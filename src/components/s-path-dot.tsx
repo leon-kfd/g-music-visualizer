@@ -1,14 +1,15 @@
 import React, { useEffect, useRef } from "react";
 import { Canvas } from '@antv/g-canvas';
-import { formatToTransit } from '../utils'
 import { IElement } from "@antv/g-canvas/lib/types";
-interface SDotProps {
+import { line, curveCardinalClosed } from 'd3'
+interface SPathDotProps {
   data?: Uint8Array;
   freshTime?: number;
 }
 
-export default function SDot(props: SDotProps) {
+export default function SPathDot(props: SPathDotProps) {
   const POINT_NUM = 128
+  const PACE_NUM = 8 // 曲率优化跳点数, 2 ** n
   const X = 200
   const Y = 200
   const R = 100
@@ -22,9 +23,10 @@ export default function SDot(props: SDotProps) {
 
   const canvas = useRef<Canvas>()
   const sArr = useRef<IElement[]>([])
+  const fakePath = useRef<IElement>()
 
   function getArray(arr: Uint8Array) {
-    return formatToTransit([...arr], 13, 0.92)
+    return [...arr]
   }
 
   function getPointByIndex(index: number, addHeight = 0) {
@@ -36,19 +38,21 @@ export default function SDot(props: SDotProps) {
   }
 
   useEffect(() => {
-    if (props.data) {
+    if (props.data && fakePath.current) {
       const arr = getArray(props.data)
-      for (let i = 0; i < arr.length / 2; i++) {
-        const item1 = arr[i]
-        const item2 = arr[arr.length - i - 1]
-        
-        const [x1, y1] = getPointByIndex(i, item1 * item1 / 65025 * 40 + 4)
-        const [x2, y2] = getPointByIndex(arr.length / 2 + i, item2 * item2 / 65025 * 40 + 4)
-        sArr.current[i].attr('x', x1)
-        sArr.current[i].attr('y', y1)
-        sArr.current[arr.length / 2 + i].attr('x', x2)
-        sArr.current[arr.length / 2 + i].attr('y', y2)
-      }
+      const PointArr = arr.reduce((pre: any, item ,index) => {
+        if (index % PACE_NUM) {
+          return [...pre, getPointByIndex(index, item * item / 65025 * 16 + 4)]
+        }
+        return pre
+      }, [])
+      const path = line().x((d) => d[0]).y((d) => d[1]).curve(curveCardinalClosed)(PointArr)
+      fakePath.current.attr('path', path)
+      sArr.current.map((item,index) => {
+        const { x, y } = (fakePath.current as any).getPoint(index / POINT_NUM)
+        item.attr('x', x)
+        item.attr('y', y)
+      })
     }
   }, [
     props.freshTime
@@ -56,7 +60,7 @@ export default function SDot(props: SDotProps) {
 
   useEffect(() => {
     canvas.current = new Canvas({
-      container: 'SDot',
+      container: 'SPathDot',
       width: 400,
       height: 400,
     });
@@ -72,8 +76,19 @@ export default function SDot(props: SDotProps) {
       },
     });
 
+    const PointArr = Array.from({ length: POINT_NUM / PACE_NUM }, (item, index: number) => {
+      return getPointByIndex(index * PACE_NUM)
+    })
+    const path = line().x((d) => d[0]).y((d) => d[1]).curve(curveCardinalClosed)(PointArr as [number,number][])
+    fakePath.current = canvas.current.addShape('path', {
+      attrs: {
+        lineWidth: 1,
+        path
+      }
+    })
     sArr.current = Array.from({ length: POINT_NUM }, (item, index: number) => {
-      const [x, y, l, t] = getPointByIndex(index)
+      const { x, y } = (fakePath.current as any).getPoint(index / POINT_NUM)
+      const [, , l, t] = getPointByIndex(index)
       const shadowOffsetX = l * SHADOW_OFFSET
       const shadowOffsetY = t * SHADOW_OFFSET
       return (canvas.current as Canvas).addShape('circle', {
@@ -93,7 +108,7 @@ export default function SDot(props: SDotProps) {
 
   return (
     <div className="s-model">
-      <div id="SDot" className="s-canvas-wrapper"></div>
+      <div id="SPathDot" className="s-canvas-wrapper"></div>
     </div>
   )
 }

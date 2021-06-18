@@ -13,7 +13,8 @@ export default function SLine(props: SLineProps) {
   const Y = 200
   const R = 100
   const OFFSET = 10
-  const REACT_WIDTH = 4
+  const RECT_WIDTH = 4
+  const RECT_COLOR = '#e9dcf7'
 
   const canvas = useRef<Canvas>()
   const sArr = useRef<IElement[]>([])
@@ -31,12 +32,15 @@ export default function SLine(props: SLineProps) {
   useEffect(() => {
     if (props.data) {
       const arr = getArray(props.data)
-      for (let i = 0; i < arr.length / 2; i++) {
-        const item1 = arr[i]
-        const item2 = arr[arr.length - i - 1]
-        sArr.current[i].attr('height', item1 * item1 / 65025 * 50 + REACT_WIDTH)
-        sArr.current[arr.length / 2 + i].attr('height', item2 * item2 / 65025 * 50 + REACT_WIDTH)
-      }
+      arr.map((item,index) => {
+        sArr.current[index].attr('height', item * item / 65025 * 50 + RECT_WIDTH)
+      })
+      // for (let i = 0; i < arr.length / 2; i++) {
+      //   const item1 = arr[i]
+      //   const item2 = arr[arr.length - i - 1]
+      //   sArr.current[i].attr('height', item1 * item1 / 65025 * 50 + RECT_WIDTH)
+      //   sArr.current[arr.length / 2 + i].attr('height', item2 * item2 / 65025 * 50 + RECT_WIDTH)
+      // }
     }
   }, [
     props.freshTime
@@ -55,8 +59,8 @@ export default function SLine(props: SLineProps) {
         y: Y,
         r: R,
         fill: '#f5f5f7',
-        stroke: 'transparent',
-        lineWidth: 4,
+        shadowColor: RECT_COLOR,
+        shadowBlur: 10
       },
     });
 
@@ -67,12 +71,12 @@ export default function SLine(props: SLineProps) {
       const r = R + OFFSET
       return (canvas.current as Canvas).addShape('rect', {
         attrs: {
-          width: REACT_WIDTH,
-          height: REACT_WIDTH,
-          radius: REACT_WIDTH / 2,
-          x: X + l * r - REACT_WIDTH / 2,
-          y: Y + t * r - REACT_WIDTH / 2,
-          fill: '#e9dcf7'
+          width: RECT_WIDTH,
+          height: RECT_WIDTH,
+          radius: RECT_WIDTH / 2,
+          x: X + l * r - RECT_WIDTH / 2,
+          y: Y + t * r - RECT_WIDTH / 2,
+          fill: RECT_COLOR
         }
       }).rotateAtPoint(X + l * r, Y + t * r, (deg - 90) * Math.PI / 180)
     })
