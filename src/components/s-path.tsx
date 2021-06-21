@@ -3,8 +3,7 @@ import { Canvas, IShape } from '@antv/g-canvas';
 import { formatToTransit } from '../utils'
 import { line, curveCardinalClosed } from 'd3'
 interface SPathProps {
-  data?: Uint8Array;
-  freshTime?: number;
+  data?: number[];
 }
 
 export default function SPath(props: SPathProps) {
@@ -18,9 +17,9 @@ export default function SPath(props: SPathProps) {
   const canvas = useRef<Canvas>()
   const sPathArr = useRef<IShape[]>([])
 
-  function getArray(arr: Uint8Array) {
+  function getArray(arr: number[]) {
     let _arr: number[] = [];
-    [...arr].map((item,index) => {
+    arr.map((item,index) => {
       if (index % 2) {
         _arr.push(item)
       }
@@ -37,18 +36,18 @@ export default function SPath(props: SPathProps) {
   }
 
   useEffect(() => {
-    if (props.data) {
+    if (props.data?.length) {
       const pathArr: any[] = [[],[],[],[]]
       getArray(props.data).map((item,index) => {
         pathArr[index % 4].push(getPointByIndex(index, item * item / 65025 * 50 + 4))
       })
       pathArr.map((item,index) => {
         const path = line().x((d: [number,number]) => d[0]).y((d: [number, number]) => d[1]).curve(curveCardinalClosed)(item)
-        sPathArr.current[index].attr('path', path)
+        sPathArr.current[index]?.attr('path', path)
       })
     }
   }, [
-    props.freshTime
+    props.data
   ])
 
   useEffect(() => {

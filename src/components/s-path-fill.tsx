@@ -3,8 +3,7 @@ import { Canvas, IShape } from '@antv/g-canvas';
 import { formatToTransit, addColorOpacity } from '../utils'
 import { line, curveCardinalClosed } from 'd3'
 interface SPathFillProps {
-  data?: Uint8Array;
-  freshTime?: number;
+  data?: number[];
 }
 
 export default function SLine(props: SPathFillProps) {
@@ -17,9 +16,9 @@ export default function SLine(props: SPathFillProps) {
   const canvas = useRef<Canvas>()
   const SPathFillArr = useRef<IShape[]>([])
 
-  function getArray(arr: Uint8Array) {
+  function getArray(arr: number[]) {
     let _arr: number[] = [];
-    [...arr].map((item,index) => {
+    arr.map((item,index) => {
       if (index % 2) {
         _arr.push(item)
       }
@@ -36,7 +35,7 @@ export default function SLine(props: SPathFillProps) {
   }
 
   useEffect(() => {
-    if (props.data) {
+    if (props.data?.length) {
       const pathArr: any[] = [[],[],[],[]]
       getArray(props.data).map((item,index) => {
         pathArr[index % 4].push(getPointByIndex(index, item * item / 65025 * 30))
@@ -47,7 +46,7 @@ export default function SLine(props: SPathFillProps) {
       })
     }
   }, [
-    props.freshTime
+    props.data
   ])
 
   useEffect(() => {

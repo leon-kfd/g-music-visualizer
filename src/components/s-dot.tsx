@@ -3,8 +3,7 @@ import { Canvas } from '@antv/g-canvas';
 import { formatToTransit } from '../utils'
 import { IElement } from "@antv/g-canvas/lib/types";
 interface SDotProps {
-  data?: Uint8Array;
-  freshTime?: number;
+  data?: number[];
 }
 
 export default function SDot(props: SDotProps) {
@@ -23,8 +22,8 @@ export default function SDot(props: SDotProps) {
   const canvas = useRef<Canvas>()
   const sArr = useRef<IElement[]>([])
 
-  function getArray(arr: Uint8Array) {
-    return formatToTransit([...arr], 13, 0.92)
+  function getArray(arr: number[]) {
+    return formatToTransit(arr, 13, 0.92)
   }
 
   function getPointByIndex(index: number, addHeight = 0) {
@@ -36,7 +35,7 @@ export default function SDot(props: SDotProps) {
   }
 
   useEffect(() => {
-    if (props.data) {
+    if (props.data?.length) {
       const arr = getArray(props.data)
       for (let i = 0; i < arr.length / 2; i++) {
         const item1 = arr[i]
@@ -51,7 +50,7 @@ export default function SDot(props: SDotProps) {
       }
     }
   }, [
-    props.freshTime
+    props.data
   ])
 
   useEffect(() => {

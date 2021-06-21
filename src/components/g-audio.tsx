@@ -16,8 +16,7 @@ export default function GAudio() {
   }, [])
 
   const [audioURL, setAudioURL] = useState<string>()
-  const [audioData, setAudioData] = useState<Uint8Array>()
-  const [freshTime, setFreshTime] = useState<number>(+new Date())
+  const [audioData, setAudioData] = useState<number[]>([])
   const [isPlaying, setIsPlaying] = useState(false)
 
   let lastTime: number
@@ -26,8 +25,7 @@ export default function GAudio() {
     if (!lastTime) lastTime = timestamp
     const progress  = timestamp - lastTime
     if (progress === 0 || progress > 0) {
-      setAudioData(MusicVisualizerCtx.getVisualizeValue())
-      setFreshTime(+new Date())
+      setAudioData([...MusicVisualizerCtx.getVisualizeValue()])
       lastTime = timestamp
     }
     raf.current = requestAnimationFrame(step)
@@ -59,11 +57,11 @@ export default function GAudio() {
         <input type="file" onChange={handleFileChange} />
       </div>
       <div className={Modules.wrapper}>
-        <SLine data={audioData} freshTime={freshTime} />
+        <SLine data={audioData} />
         {/* <SDot data={audioData} freshTime={freshTime} /> // 不够平滑，弃用 */}
-        <SPathDot data={audioData} freshTime={freshTime} />
-        <SPath data={audioData} freshTime={freshTime} />
-        <SPathFill data={audioData} freshTime={freshTime} />
+        <SPathDot data={audioData} />
+        <SPath data={audioData} />
+        <SPathFill data={audioData} />
         <SCircle isPlaying={isPlaying}/>
       </div>
     </>

@@ -3,8 +3,7 @@ import { Canvas } from '@antv/g-canvas';
 import { IElement } from "@antv/g-canvas/lib/types";
 import { line, curveCardinalClosed } from 'd3'
 interface SPathDotProps {
-  data?: Uint8Array;
-  freshTime?: number;
+  data?: number[];
 }
 
 export default function SPathDot(props: SPathDotProps) {
@@ -25,8 +24,8 @@ export default function SPathDot(props: SPathDotProps) {
   const sArr = useRef<IElement[]>([])
   const fakePath = useRef<IElement>()
 
-  function getArray(arr: Uint8Array) {
-    return [...arr]
+  function getArray(arr: number[]) {
+    return arr
   }
 
   function getPointByIndex(index: number, addHeight = 0) {
@@ -38,7 +37,7 @@ export default function SPathDot(props: SPathDotProps) {
   }
 
   useEffect(() => {
-    if (props.data && fakePath.current) {
+    if (props.data?.length && fakePath.current) {
       const arr = getArray(props.data)
       const PointArr = arr.reduce((pre: any, item ,index) => {
         if (index % PACE_NUM) {
@@ -55,7 +54,7 @@ export default function SPathDot(props: SPathDotProps) {
       })
     }
   }, [
-    props.freshTime
+    props.data
   ])
 
   useEffect(() => {

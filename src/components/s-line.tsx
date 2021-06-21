@@ -3,8 +3,7 @@ import { Canvas } from '@antv/g-canvas';
 import { IElement } from "@antv/g-canvas/lib/types";
 import { formatToTransit } from '../utils'
 interface SLineProps {
-  data?: Uint8Array;
-  freshTime?: number;
+  data?: number[];
 }
 
 export default function SLine(props: SLineProps) {
@@ -19,8 +18,8 @@ export default function SLine(props: SLineProps) {
   const canvas = useRef<Canvas>()
   const sArr = useRef<IElement[]>([])
 
-  function getArray(arr: Uint8Array) {
-    const filterArr = [...arr].reduce((prev: number[], curr: number, index: number) => {
+  function getArray(arr: number[]) {
+    const filterArr = arr.reduce((prev: number[], curr: number, index: number) => {
       if (index % 2) {
         prev.push(curr)
       }
@@ -30,7 +29,7 @@ export default function SLine(props: SLineProps) {
   }
 
   useEffect(() => {
-    if (props.data) {
+    if (props.data?.length) {
       const arr = getArray(props.data)
       arr.map((item,index) => {
         sArr.current[index].attr('height', item * item / 65025 * 50 + RECT_WIDTH)
@@ -43,7 +42,7 @@ export default function SLine(props: SLineProps) {
       // }
     }
   }, [
-    props.freshTime
+    props.data
   ])
 
   useEffect(() => {

@@ -3,8 +3,7 @@ import { Canvas, IShape } from '@antv/g-canvas';
 import { getCirclePath } from '../utils'
 
 interface SCircleProps {
-  data?: Uint8Array;
-  freshTime?: number;
+  data?: number[];
   isPlaying: boolean;
 }
 
