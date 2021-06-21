@@ -61,9 +61,9 @@ export default function SLine(props: SPathFillProps) {
         x: X,
         y: Y,
         r: R,
-        fill: '#f5f5f7',
-        shadowColor: COLORS[0],
-        shadowBlur: 10
+        fill: '#f0f0f2',
+        // shadowColor: COLORS[0],
+        // shadowBlur: 10
       }
     }).setZIndex(2);
 

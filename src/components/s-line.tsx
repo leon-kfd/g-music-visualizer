@@ -57,7 +57,7 @@ export default function SLine(props: SLineProps) {
         x: X,
         y: Y,
         r: R,
-        fill: '#f5f5f7',
+        fill: '#f0f0f2',
         shadowColor: RECT_COLOR,
         shadowBlur: 10
       },

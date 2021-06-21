@@ -69,7 +69,7 @@ export default function SPathDot(props: SPathDotProps) {
         x: X,
         y: Y,
         r: R,
-        fill: '#f5f5f7',
+        fill: '#f0f0f2',
         shadowColor: DOT_COLOR,
         shadowBlur: 10
       },
