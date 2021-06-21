@@ -2,7 +2,7 @@ name: Deploy Doc Website
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   main-deploy:
