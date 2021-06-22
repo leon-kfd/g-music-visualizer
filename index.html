@@ -4,12 +4,34 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>G Music Visualizer</title>
-  <script type="module" crossorigin src="./assets/index.74fbef31.js"></script>
+    <style>
+      #fps > div {
+        right: 0;
+        left: auto !important;
+      }
+    </style>
+  <script type="module" crossorigin src="./assets/index.ce5b88b0.js"></script>
   <link rel="modulepreload" href="./assets/vendor.37d9fc5b.js">
-  <link rel="stylesheet" href="./assets/index.9439cb10.css">
+  <link rel="stylesheet" href="./assets/index.02d3e45f.css">
 </head>
   <body>
     <div id="root"></div>
+    <div id="fps"></div>
     
+    <script>
+      (function(){
+        var script = document.createElement('script');
+        script.onload = function(){
+          var stats = new Stats();
+          document.querySelector('#fps').appendChild(stats.dom);
+          requestAnimationFrame(function loop(){
+            stats.update();
+            requestAnimationFrame(loop)
+          });
+        };
+        script.src = '//cdn.jsdelivr.net/npm/stats.js@0.17.0/build/stats.min.js';
+        document.head.appendChild(script);
+      })();
+    </script>
   </body>
 </html>
