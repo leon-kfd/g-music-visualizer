@@ -8,6 +8,7 @@ import SPathDot from './s-path-dot'
 import SPathFill from './s-path-fill'
 import SCircle from './s-circle'
 import SPathDouble from './s-path-double'
+import SPaticle from "./s-particle";
 
 export const MusicVisualizerCtx = new MusicVisualizer()
 export default function GAudio() {
@@ -51,6 +52,7 @@ export default function GAudio() {
         {
           display: 'flex',
           alignItems: 'center',
+          flexWrap: 'wrap',
           padding: '20px'
         }
       }>
@@ -65,6 +67,7 @@ export default function GAudio() {
         <SPathFill data={audioData} />
         <SPathDouble data={audioData} />
         <SCircle isPlaying={isPlaying} data={audioData} />
+        <SPaticle isPlaying={isPlaying} data={audioData} />
       </div>
     </>
   )

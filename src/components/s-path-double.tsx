@@ -17,6 +17,7 @@ export default function SPath(props: SPathDouble) {
 
   const canvas = useRef<Canvas>()
   const sPath = useRef<IShape>()
+  const lineArr = useRef<IShape[]>([])
 
   function getArray(arr: number[]) {
     let _arr: number[] = [];
@@ -25,7 +26,7 @@ export default function SPath(props: SPathDouble) {
         _arr.push(item)
       }
     })
-    return formatToTransit(_arr, 7, 0.4)
+    return formatToTransit(_arr, 5, 0.5)
   }
 
   function getPointByIndex(index: number, addHeight = 0):[number, number] {
@@ -39,11 +40,16 @@ export default function SPath(props: SPathDouble) {
   useEffect(() => {
     if (props.data?.length) {
       const pathPointArr: [number,number][] = []
-      getArray(props.data).map((item,index) => {
-        pathPointArr.push(getPointByIndex(index, item * item / 65025 * 60))
-      })
-      getArray(props.data).map((item, index) => {
-        pathPointArr.push(getPointByIndex(index, -item * item / 65025 * 10))
+      const arr = getArray(props.data)
+      arr.map((item,index) => {
+        const point1 = getPointByIndex(index, item * item / 65025 * 60)
+        const point2 = getPointByIndex(index, -item * item / 65025 * 12)
+        pathPointArr[index] = point1
+        pathPointArr[arr.length + index] = point2
+        lineArr.current[index].attr('x1', point1[0])
+        lineArr.current[index].attr('y1', point1[1])
+        lineArr.current[index].attr('x2', point2[0])
+        lineArr.current[index].attr('y2', point2[1])
       })
       const path = line().x((d: [number,number]) => d[0]).y((d: [number, number]) => d[1]).curve(curveCardinalClosed)(pathPointArr)
       sPath.current?.attr('path', path)
@@ -76,6 +82,19 @@ export default function SPath(props: SPathDouble) {
         lineWidth: 1,
         path: getCirclePath(X, Y, R + OFFSET)
       }
+    })
+
+    lineArr.current = Array.from({length: POINT_NUM}, (item, index) => {
+      return (canvas.current as Canvas).addShape('line', {
+        attrs: {
+          x1: X,
+          y1: Y - R,
+          x2: X,
+          y2: Y - R,
+          stroke: COLOR,
+          lineWidth: 1
+        }
+      })
     })
     
   }, [])

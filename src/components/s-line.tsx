@@ -25,7 +25,7 @@ export default function SLine(props: SLineProps) {
       }
       return prev
     }, [])
-    return formatToTransit(filterArr)
+    return formatToTransit(filterArr, 5, 0.6)
   }
 
   useEffect(() => {
