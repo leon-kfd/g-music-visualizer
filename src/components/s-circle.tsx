@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Canvas, IShape } from '@antv/g-canvas';
 import { getCirclePath } from '../utils'
+import { getImageCircle } from '../utils/base';
 
 interface SCircleProps {
-  data?: number[];
   isPlaying: boolean;
+  data: number[];
 }
 
 export default function SCircle(props: SCircleProps) {
@@ -18,6 +19,8 @@ export default function SCircle(props: SCircleProps) {
   const CIRCLE_DELAY = 2000
 
   const canvas = useRef<Canvas>()
+  const circle = useRef<IShape>()
+
   const circleArr = useRef<IShape[]>([])
   const circleDotArr = useRef<IShape[]>([])
   const circleDotDegArr = useRef<number[]>([])
@@ -28,15 +31,15 @@ export default function SCircle(props: SCircleProps) {
   // 拾取初始角度
   const pickStartPoint = () => {
     // 以下realtimeData为实时音频数据，将随机峰值最高的10个选出1个作为初始角度
-    // const arr = realtimeData.current || []
-    // const _arr = arr.sort((a, b) => b - a).slice(0, 10)
-    // const random = ~~(Math.random() * 10)
-    // const randomValue = _arr[random]
-    // const index = arr.findIndex(i => i === randomValue)
-    // const result = ~index ? index * 360 / arr.length : 1
+    const arr = realtimeData.current || []
+    const _arr = arr.sort((a, b) => b - a).slice(0, 10)
+    const random = ~~(Math.random() * 10)
+    const randomValue = _arr[random]
+    const index = arr.findIndex(i => i === randomValue)
+    const result = ~index ? index * 360 / arr.length : 1
 
     // 未对音频数据进行拾取，直接使用了随机角度，未找到合适算法
-    const result = ~~(Math.random() * 360)
+    // const result = ~~(Math.random() * 360)
     return result
   }
 
@@ -51,16 +54,12 @@ export default function SCircle(props: SCircleProps) {
         width: 400,
         height: 400,
       });
-      
-      canvas.current.addShape('circle', {
-        attrs: {
-          x: X,
-          y: Y,
-          r: R,
-          fill: '#f0f0f2',
-          shadowColor: '#fcc8d9',
-          shadowBlur: 10
-        }
+
+      circle.current = getImageCircle(canvas.current, {
+        x: X,
+        y: Y,
+        r: R,
+        shadowColor: '#fcc8d9'
       })
 
       const addCircle = () => {
@@ -145,6 +144,16 @@ export default function SCircle(props: SCircleProps) {
         }
       })
     }
+  }, [props.isPlaying])
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (props.isPlaying) {
+        circle.current?.resumeAnimate()
+      } else {
+        circle.current?.pauseAnimate()
+      }
+    })
   }, [props.isPlaying])
 
   return (

@@ -1,14 +1,15 @@
 import React, { useEffect, useRef } from 'react';
 import { Canvas, IShape } from '@antv/g-canvas';
+import { getImageCircle } from '../utils/base'
 
 interface SPaticle {
-  data?: number[];
   isPlaying: boolean;
+  data: number[];
 }
 
 export default function SPaticle(props: SPaticle) {
   const POINT_NUM = 64
-  const PARTICLE_NUM = 24
+  const PARTICLE_NUM = 8
   const X = 200
   const Y = 200
   const R = 100
@@ -18,6 +19,7 @@ export default function SPaticle(props: SPaticle) {
   const POINT_CREATE_DELAY = 4000
 
   const canvas = useRef<Canvas>()
+  const circle = useRef<IShape>()
 
   const particleArr = useRef<IShape[]>([])
   const particleStartArr = useRef<boolean[]>([])
@@ -31,8 +33,17 @@ export default function SPaticle(props: SPaticle) {
         return
       } else {
         timer.current = setTimeout(() => {
-          // pick, 当前为随机拾取，可以为prop.data选择合适算法拾取出一个index，但未找到合适算法
-          currentActiveIndex.current = ~~(Math.random() * POINT_NUM)
+          const arr = props.data ? props.data.reduce((pre: number[],curr,index) => {
+            if (index % 2) return [...pre, curr]
+            return pre
+          }, []) : []
+          const _arr = arr.sort((a, b) => b - a).slice(0, 10)
+          const random = ~~(Math.random() * 10)
+          const randomValue = _arr[random]
+          const result = arr.findIndex(i => i === randomValue)
+
+          // currentActiveIndex.current = ~~(Math.random() * POINT_NUM)
+          currentActiveIndex.current = result
           timer.current = 0
           clearTimeout(timer.current)
         }, 300)
@@ -47,16 +58,12 @@ export default function SPaticle(props: SPaticle) {
         width: 400,
         height: 400,
       });
-      
-      canvas.current.addShape('circle', {
-        attrs: {
-          x: X,
-          y: Y,
-          r: R,
-          fill: '#f0f0f2',
-          shadowColor: '#fcc8d9',
-          shadowBlur: 10
-        }
+
+      circle.current = getImageCircle(canvas.current, {
+        x: X,
+        y: Y,
+        r: R,
+        shadowColor: '#fcc8d9'
       })
       
       Array.from({ length: POINT_NUM }, (point, index1) => {
@@ -134,6 +141,16 @@ export default function SPaticle(props: SPaticle) {
         })
       })
     }
+  }, [props.isPlaying])
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (props.isPlaying) {
+        circle.current?.resumeAnimate()
+      } else {
+        circle.current?.pauseAnimate()
+      }
+    })
   }, [props.isPlaying])
 
   return (

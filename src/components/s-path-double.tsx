@@ -2,8 +2,10 @@ import React, { useEffect, useRef } from "react";
 import { Canvas, IShape } from '@antv/g-canvas';
 import { formatToTransit, getCirclePath } from '../utils'
 import { line, curveCardinalClosed } from 'd3'
+import { getImageCircle } from '../utils/base';
 interface SPathDouble {
-  data?: number[];
+  isPlaying: boolean;
+  data: number[];
 }
 
 export default function SPath(props: SPathDouble) {
@@ -16,6 +18,8 @@ export default function SPath(props: SPathDouble) {
   // const COLORS = ['#e9dcf7', '#cdd9f5', '#cdf5dd', '#f3dfbb']
 
   const canvas = useRef<Canvas>()
+  const circle = useRef<IShape>()
+
   const sPath = useRef<IShape>()
   const lineArr = useRef<IShape[]>([])
 
@@ -26,7 +30,7 @@ export default function SPath(props: SPathDouble) {
         _arr.push(item)
       }
     })
-    return formatToTransit(_arr, 5, 0.5)
+    return formatToTransit(_arr, 3, 0.5)
   }
 
   function getPointByIndex(index: number, addHeight = 0):[number, number] {
@@ -65,16 +69,12 @@ export default function SPath(props: SPathDouble) {
       height: 400,
     });
 
-    canvas.current.addShape('circle', {
-      attrs: {
-        x: X,
-        y: Y,
-        r: R,
-        fill: '#f0f0f2',
-        shadowColor: COLOR,
-        shadowBlur: 10
-      }
-    });
+    circle.current = getImageCircle(canvas.current, {
+      x: X,
+      y: Y,
+      r: R,
+      shadowColor: COLOR
+    })
 
     sPath.current = canvas.current.addShape('path', {
       attrs: {
@@ -98,6 +98,16 @@ export default function SPath(props: SPathDouble) {
     })
     
   }, [])
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (props.isPlaying) {
+        circle.current?.resumeAnimate()
+      } else {
+        circle.current?.pauseAnimate()
+      }
+    })
+  }, [props.isPlaying])
 
   return (
     <div className="s-model">

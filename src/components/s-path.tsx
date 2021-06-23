@@ -2,8 +2,10 @@ import React, { useEffect, useRef } from "react";
 import { Canvas, IShape } from '@antv/g-canvas';
 import { formatToTransit } from '../utils'
 import { line, curveCardinalClosed } from 'd3'
+import { getImageCircle } from '../utils/base';
 interface SPathProps {
-  data?: number[];
+  isPlaying: boolean;
+  data: number[];
 }
 
 export default function SPath(props: SPathProps) {
@@ -11,10 +13,13 @@ export default function SPath(props: SPathProps) {
   const X = 200
   const Y = 200
   const R = 100
-  const OFFSET = 10
+  const OFFSET = 4
+  const POINT_OFFSET = 30
   const COLORS = ['#e9dcf7', '#cdd9f5', '#cdf5dd', '#f3dfbb']
+  // const COLORS = ['#4E4BD7', '#BB4BD7', '#4BD773', '#D7544B']
 
   const canvas = useRef<Canvas>()
+  const circle = useRef<IShape>()
   const sPathArr = useRef<IShape[]>([])
 
   function getArray(arr: number[]) {
@@ -39,7 +44,7 @@ export default function SPath(props: SPathProps) {
     if (props.data?.length) {
       const pathArr: any[] = [[],[],[],[]]
       getArray(props.data).map((item,index) => {
-        pathArr[index % 4].push(getPointByIndex(index, item * item / 65025 * 50 + 4))
+        pathArr[index % 4].push(getPointByIndex(index, item * item / 65025 * POINT_OFFSET + 4))
       })
       pathArr.map((item,index) => {
         const path = line().x((d: [number,number]) => d[0]).y((d: [number, number]) => d[1]).curve(curveCardinalClosed)(item)
@@ -57,16 +62,12 @@ export default function SPath(props: SPathProps) {
       height: 400,
     });
 
-    canvas.current.addShape('circle', {
-      attrs: {
-        x: X,
-        y: Y,
-        r: R,
-        fill: '#f0f0f2',
-        shadowColor: COLORS[0],
-        shadowBlur: 10
-      }
-    });
+    circle.current = getImageCircle(canvas.current, {
+      x: X,
+      y: Y,
+      r: R,
+      shadowColor: COLORS[0]
+    })
 
     const PointArr = Array.from({ length: POINT_NUM / 4 }, (item, index: number) => {
       return getPointByIndex(index * 4)
@@ -81,8 +82,17 @@ export default function SPath(props: SPathProps) {
         }
       }))
     })
-    
   }, [])
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (props.isPlaying) {
+        circle.current?.resumeAnimate()
+      } else {
+        circle.current?.pauseAnimate()
+      }
+    })
+  }, [props.isPlaying])
 
   return (
     <div className="s-model">

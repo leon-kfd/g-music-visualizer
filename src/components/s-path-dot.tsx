@@ -1,14 +1,17 @@
 import React, { useEffect, useRef } from "react";
-import { Canvas } from '@antv/g-canvas';
+import { Canvas, IShape } from '@antv/g-canvas';
 import { IElement } from "@antv/g-canvas/lib/types";
-import { line, curveCardinalClosed } from 'd3'
+import { line, curveCardinalClosed } from 'd3';
+import { getImageCircle } from '../utils/base';
 interface SPathDotProps {
-  data?: number[];
+  isPlaying: boolean;
+  data: number[];
 }
 
 export default function SPathDot(props: SPathDotProps) {
   const POINT_NUM = 128
   const PACE_NUM = 8 // 曲率优化跳点数, 2 ** n
+  const JUME_OFFSET = 36 // 波动幅度
   const X = 200
   const Y = 200
   const R = 100
@@ -21,6 +24,8 @@ export default function SPathDot(props: SPathDotProps) {
   
 
   const canvas = useRef<Canvas>()
+  const circle = useRef<IShape>()
+
   const sArr = useRef<IElement[]>([])
   const fakePath = useRef<IElement>()
 
@@ -41,7 +46,7 @@ export default function SPathDot(props: SPathDotProps) {
       const arr = getArray(props.data)
       const PointArr = arr.reduce((pre: any, item ,index) => {
         if (index % PACE_NUM) {
-          return [...pre, getPointByIndex(index, item * item / 65025 * 16 + 4)]
+          return [...pre, getPointByIndex(index, item * item / 65025 * JUME_OFFSET + 4)]
         }
         return pre
       }, [])
@@ -63,17 +68,13 @@ export default function SPathDot(props: SPathDotProps) {
       width: 400,
       height: 400,
     });
-    
-    canvas.current.addShape('circle', {
-      attrs: {
-        x: X,
-        y: Y,
-        r: R,
-        fill: '#f0f0f2',
-        shadowColor: DOT_COLOR,
-        shadowBlur: 10
-      },
-    });
+
+    circle.current = getImageCircle(canvas.current, {
+      x: X,
+      y: Y,
+      r: R,
+      shadowColor: DOT_COLOR
+    })
 
     const PointArr = Array.from({ length: POINT_NUM / PACE_NUM }, (item, index: number) => {
       return getPointByIndex(index * PACE_NUM)
@@ -104,6 +105,16 @@ export default function SPathDot(props: SPathDotProps) {
       })
     })
   }, [])
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (props.isPlaying) {
+        circle.current?.resumeAnimate()
+      } else {
+        circle.current?.pauseAnimate()
+      }
+    })
+  }, [props.isPlaying])
 
   return (
     <div className="s-model">

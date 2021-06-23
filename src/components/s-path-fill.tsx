@@ -2,8 +2,10 @@ import React, { useEffect, useRef } from "react";
 import { Canvas, IShape } from '@antv/g-canvas';
 import { formatToTransit, addColorOpacity } from '../utils'
 import { line, curveCardinalClosed } from 'd3'
+import { getImageCircle } from '../utils/base';
 interface SPathFillProps {
-  data?: number[];
+  isPlaying: boolean;
+  data: number[];
 }
 
 export default function SLine(props: SPathFillProps) {
@@ -11,9 +13,13 @@ export default function SLine(props: SPathFillProps) {
   const X = 200
   const Y = 200
   const R = 100
-  const COLORS = ['#cdf5dd', '#e8fdc8', '#dafcf0', '#f3f8c9']
+  const POINT_OFFSET = 60
+  // const COLORS = ['#cdf5dd', '#e8fdc8', '#dafcf0', '#f3f8c9']
+  const COLORS = ['#81D8F2', '#67A1E0', '#5263C2', '#74E1A5']
 
   const canvas = useRef<Canvas>()
+  const circle = useRef<IShape>()
+
   const SPathFillArr = useRef<IShape[]>([])
 
   function getArray(arr: number[]) {
@@ -38,7 +44,7 @@ export default function SLine(props: SPathFillProps) {
     if (props.data?.length) {
       const pathArr: any[] = [[],[],[],[]]
       getArray(props.data).map((item,index) => {
-        pathArr[index % 4].push(getPointByIndex(index, item * item / 65025 * 30))
+        pathArr[index % 4].push(getPointByIndex(index, item * item / 65025 * POINT_OFFSET))
       })
       pathArr.map((item,index) => {
         const path = line().x((d: [number,number]) => d[0]).y((d: [number, number]) => d[1]).curve(curveCardinalClosed)(item)
@@ -56,16 +62,12 @@ export default function SLine(props: SPathFillProps) {
       height: 400,
     });
 
-    canvas.current.addShape('circle', {
-      attrs: {
-        x: X,
-        y: Y,
-        r: R,
-        fill: '#f0f0f2',
-        // shadowColor: COLORS[0],
-        // shadowBlur: 10
-      }
-    }).setZIndex(2);
+    circle.current = getImageCircle(canvas.current, {
+      x: X,
+      y: Y,
+      r: R,
+      shadowColor: '#ffffff'
+    }).setZIndex(2)
 
     const PointArr = Array.from({ length: POINT_NUM / 4 }, (item, index: number) => {
       return getPointByIndex(index * 4)
@@ -77,12 +79,21 @@ export default function SLine(props: SPathFillProps) {
           stroke: COLORS[index],
           lineWidth: 1,
           path,
-          fill: addColorOpacity(COLORS[index], .4)
+          fill: addColorOpacity(COLORS[index], 0.2)
         }
       }).setZIndex(1))
     })
-    
   }, [])
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (props.isPlaying) {
+        circle.current?.resumeAnimate()
+      } else {
+        circle.current?.pauseAnimate()
+      }
+    })
+  }, [props.isPlaying])
 
   return (
     <div className="s-model">

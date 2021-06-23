@@ -1,9 +1,11 @@
 import React, { useEffect, useRef } from "react";
 import { Canvas } from '@antv/g-canvas';
-import { IElement } from "@antv/g-canvas/lib/types";
-import { formatToTransit } from '../utils'
+import { IElement, IShape } from "@antv/g-canvas/lib/types";
+// import { formatToTransit } from '../utils'
+import { getImageCircle } from '../utils/base'
 interface SLineProps {
-  data?: number[];
+  isPlaying: boolean
+  data: number[];
 }
 
 export default function SLine(props: SLineProps) {
@@ -16,6 +18,7 @@ export default function SLine(props: SLineProps) {
   const RECT_COLOR = '#e9dcf7'
 
   const canvas = useRef<Canvas>()
+  const circle = useRef<IShape>()
   const sArr = useRef<IElement[]>([])
 
   function getArray(arr: number[]) {
@@ -25,7 +28,8 @@ export default function SLine(props: SLineProps) {
       }
       return prev
     }, [])
-    return formatToTransit(filterArr, 5, 0.6)
+    // return formatToTransit(filterArr, 5, 0.6)
+    return filterArr
   }
 
   useEffect(() => {
@@ -34,12 +38,6 @@ export default function SLine(props: SLineProps) {
       arr.map((item,index) => {
         sArr.current[index].attr('height', item * item / 65025 * 50 + RECT_WIDTH)
       })
-      // for (let i = 0; i < arr.length / 2; i++) {
-      //   const item1 = arr[i]
-      //   const item2 = arr[arr.length - i - 1]
-      //   sArr.current[i].attr('height', item1 * item1 / 65025 * 50 + RECT_WIDTH)
-      //   sArr.current[arr.length / 2 + i].attr('height', item2 * item2 / 65025 * 50 + RECT_WIDTH)
-      // }
     }
   }, [
     props.data
@@ -51,17 +49,13 @@ export default function SLine(props: SLineProps) {
       width: 400,
       height: 400,
     });
-    
-    canvas.current.addShape('circle', {
-      attrs: {
-        x: X,
-        y: Y,
-        r: R,
-        fill: '#f0f0f2',
-        shadowColor: RECT_COLOR,
-        shadowBlur: 10
-      },
-    });
+
+    circle.current = getImageCircle(canvas.current, {
+      x: X,
+      y: Y,
+      r: R,
+      shadowColor: RECT_COLOR
+    })
 
     sArr.current = Array.from({ length: POINT_NUM }, (item, index: number) => {
       const deg = index * (360 / POINT_NUM) - 150;
@@ -80,6 +74,16 @@ export default function SLine(props: SLineProps) {
       }).rotateAtPoint(X + l * r, Y + t * r, (deg - 90) * Math.PI / 180)
     })
   }, [])
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (props.isPlaying) {
+        circle.current?.resumeAnimate()
+      } else {
+        circle.current?.pauseAnimate()
+      }
+    })
+  }, [props.isPlaying])
 
   return (
     <div className="s-model">
