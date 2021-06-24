@@ -3,6 +3,7 @@ import { Canvas, IShape } from '@antv/g-canvas';
 import { formatToTransit } from '../utils'
 import { line, curveCardinalClosed } from 'd3'
 import { getImageCircle } from '../utils/base';
+import { X, Y, R } from '../utils/constanst'
 interface SPathProps {
   isPlaying: boolean;
   data: number[];
@@ -10,9 +11,6 @@ interface SPathProps {
 
 export default function SPath(props: SPathProps) {
   const POINT_NUM = 64
-  const X = 200
-  const Y = 200
-  const R = 100
   const OFFSET = 4
   const POINT_OFFSET = 30
   const COLORS = ['#e9dcf7', '#cdd9f5', '#cdf5dd', '#f3dfbb']
@@ -58,8 +56,8 @@ export default function SPath(props: SPathProps) {
   useEffect(() => {
     canvas.current = new Canvas({
       container: 'SPath',
-      width: 400,
-      height: 400,
+      width: 2 * X,
+      height: 2 * Y,
     });
 
     circle.current = getImageCircle(canvas.current, {

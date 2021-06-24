@@ -3,6 +3,7 @@ import { Canvas } from '@antv/g-canvas';
 import { IElement, IShape } from "@antv/g-canvas/lib/types";
 // import { formatToTransit } from '../utils'
 import { getImageCircle } from '../utils/base'
+import { X, Y, R } from '../utils/constanst'
 interface SLineProps {
   isPlaying: boolean
   data: number[];
@@ -10,9 +11,6 @@ interface SLineProps {
 
 export default function SLine(props: SLineProps) {
   const POINT_NUM = 64
-  const X = 200
-  const Y = 200
-  const R = 100
   const OFFSET = 10
   const RECT_WIDTH = 4
   const RECT_COLOR = '#e9dcf7'
@@ -46,8 +44,8 @@ export default function SLine(props: SLineProps) {
   useEffect(() => {
     canvas.current = new Canvas({
       container: 'SLine',
-      width: 400,
-      height: 400,
+      width: 2 * X,
+      height: 2 * Y,
     });
 
     circle.current = getImageCircle(canvas.current, {

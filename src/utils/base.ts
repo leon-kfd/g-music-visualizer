@@ -1,6 +1,5 @@
 import { Canvas, IShape } from "@antv/g-canvas";
 import { ext } from '@antv/matrix-util';
-import { useEffect, useRef } from 'react'
 
 const { transform } = ext
 
@@ -30,7 +29,7 @@ export function getImageCircle(canvas: Canvas, { x, y, r, shadowColor }: ImageCi
       y: y - r,
       width: 2 * r,
       height: 2 * r,
-      img: `https://source.unsplash.com/random/${2 * r}x${2 * r}`
+      img: `https://source.unsplash.com/random/${2 * r}x${2 * r}?Nature`
     }
   })
   shape.setClip({

@@ -3,6 +3,7 @@ import { Canvas, IShape } from '@antv/g-canvas';
 import { IElement } from "@antv/g-canvas/lib/types";
 import { line, curveCardinalClosed } from 'd3';
 import { getImageCircle } from '../utils/base';
+import { X, Y, R } from '../utils/constanst'
 interface SPathDotProps {
   isPlaying: boolean;
   data: number[];
@@ -12,9 +13,6 @@ export default function SPathDot(props: SPathDotProps) {
   const POINT_NUM = 128
   const PACE_NUM = 8 // 曲率优化跳点数, 2 ** n
   const JUME_OFFSET = 36 // 波动幅度
-  const X = 200
-  const Y = 200
-  const R = 100
   const OFFSET = 10
   const DOT_R = 1.2
   const DOT_COLOR = '#e9dcf7'
@@ -65,8 +63,8 @@ export default function SPathDot(props: SPathDotProps) {
   useEffect(() => {
     canvas.current = new Canvas({
       container: 'SPathDot',
-      width: 400,
-      height: 400,
+      width: 2 * X,
+      height: 2 * Y,
     });
 
     circle.current = getImageCircle(canvas.current, {

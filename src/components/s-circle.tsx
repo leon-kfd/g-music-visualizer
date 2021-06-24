@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Canvas, IShape } from '@antv/g-canvas';
 import { getCirclePath } from '../utils'
 import { getImageCircle } from '../utils/base';
+import { X, Y, R } from '../utils/constanst'
 
 interface SCircleProps {
   isPlaying: boolean;
@@ -9,9 +10,6 @@ interface SCircleProps {
 }
 
 export default function SCircle(props: SCircleProps) {
-  const X = 200
-  const Y = 200
-  const R = 100
   const LINE_COLOR = '#fff'
   const DOT_COLOR = '#e9dcf7'
   const DOT_R = 5
@@ -51,8 +49,8 @@ export default function SCircle(props: SCircleProps) {
     if (!canvas.current) {
       canvas.current = new Canvas({
         container: 'SCircle',
-        width: 400,
-        height: 400,
+        width: 2 * X,
+        height: 2 * Y,
       });
 
       circle.current = getImageCircle(canvas.current, {

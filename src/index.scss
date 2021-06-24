@@ -31,11 +31,49 @@ ul, li {
   white-space: nowrap;
 }
 
+.btn {
+  display: inline-flex;
+  outline: none;
+  border: none;
+  position: relative;
+  align-items: center;
+  user-select: none;
+  vertical-align: middle;
+  -moz-appearance: none;
+  justify-content: center;
+  text-decoration: none;
+  background-color: transparent;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  padding: 6px 16px;
+  font-size: 0.875rem;
+  min-width: 64px;
+  box-sizing: border-box;
+  transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: uppercase;
+  color: #fff;
+  background-color: #1976d2;
+}
+
+.strong-text {
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  color: #262626;
+}
+
+.m10 {
+  margin: 10px;
+}
 
 .s-model {
   position: relative;
-  width: 400px;
-  height: 400px;
+  width: 300px;
+  height: 300px;
   border-radius: 4px;
   box-shadow: 0 0 10px #eee;
   overflow: hidden;
@@ -47,7 +85,7 @@ ul, li {
     left: 0;
     right: 0;
     bottom: 0;
-    background: url(https://kongfandong.cn/api/randomPhoto?w=400&h=400);
+    background: url(https://source.unsplash.com/random/300x300?Nature);
     filter: blur(40px);
     z-index: 1;
   }

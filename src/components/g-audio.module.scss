@@ -1,4 +1,14 @@
-.wrapper {
+.operationWrapper {
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.audioWrapper {
+  padding: 0 20px;
+  margin: 10px 0;
+}
+.exampleWrapper {
   padding: 0 10px;
   display: flex;
   flex-wrap: wrap;

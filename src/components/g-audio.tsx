@@ -9,6 +9,7 @@ import SCircle from './s-circle'
 import SPathDouble from './s-path-double'
 import SDot from "./s-dot";
 import SPaticle from "./s-particle";
+import { apiURL } from '@/global'
 
 export const MusicVisualizerCtx = new MusicVisualizer()
 export default function GAudio() {
@@ -17,9 +18,12 @@ export default function GAudio() {
     MusicVisualizerCtx.setAudioEl(audio.current as HTMLAudioElement)
   }, [])
 
+  const [musicName, setMusicName] = useState('Please load a music...')
   const [audioURL, setAudioURL] = useState<string>()
   const [audioData, setAudioData] = useState<number[]>([])
   const [isPlaying, setIsPlaying] = useState(false)
+
+  const hiddenFileInput = useRef<HTMLInputElement>(null)
 
   let lastTime: number
   let raf = useRef<number>()
@@ -41,78 +45,44 @@ export default function GAudio() {
     raf.current && cancelAnimationFrame(raf.current)
   }
 
+  async function handleLoadRandomMusic() {
+    try {
+      const res1 = await fetch('https://api.uomg.com/api/rand.music?sort=%E7%83%AD%E6%AD%8C%E6%A6%9C&format=json')
+      const { data } = await res1.json()
+      const { name, url, artistsname, picurl } = data
+      const res2 = await fetch(`${apiURL}/api/neteaseMusic?target=${url}`)
+      const { url: redirect } = await res2.json()
+      setMusicName(`${name}-${artistsname}`)
+      setAudioURL(redirect)
+    } catch(e) {
+      console.error(e)
+      alert('Load error...')
+    }
+  }
+
+  function handleChooseRandomMusic() {
+    hiddenFileInput.current?.click()
+  }
+
   function handleFileChange(e: any) {
-    const url = URL.createObjectURL(e.target.files[0])
+    const file = e.target.files[0]
+    const url = URL.createObjectURL(file)
+    setMusicName(file.name)
     setAudioURL(url)
   }
 
-  // const fullList = [
-  //   {
-  //     name: 'SLine',
-  //     c: SLine
-  //   },
-  //   {
-  //     name: 'SPath',
-  //     c: SPath
-  //   },
-  //   {
-  //     name: 'SPaticle',
-  //     c: SPaticle
-  //   }
-  // ]
-  // const [checkList, setCheckList] = useState(fullList.map(item => item.name))
-
-  // function changeList(event: any) {
-  //   const target = event.target as HTMLInputElement;
-  //   const value = target.value
-  //   const index = checkList.indexOf(value)
-  //   console.log('value', value, 'checked', target.checked, 'index', index)
-  //   const _checkList = [...checkList]
-  //   if (target.checked) {
-  //     _checkList.push(value)
-  //   } else {
-  //     _checkList.splice(index, 1)
-  //   }
-  //   setCheckList(_checkList)
-  // }
-
   return (
     <>
-      <div style={
-        {
-          display: 'flex',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          padding: '20px'
-        }
-      }>
-        <audio controls onPlay={play} onPause={pause} ref={audio} src={audioURL} style={{marginRight: '10px'}}></audio>
-        <input type="file" onChange={handleFileChange} />
+      <div className={Modules.operationWrapper}>
+        <button className="btn m10" onClick={handleLoadRandomMusic}>Random a online music</button>
+        <button className="btn m10" onClick={handleChooseRandomMusic}>Choose a local muisc</button>
+        <div className="strong-text m10" style={{minWidth: '200px'}}>{musicName}</div>
+        <input type="file" style={{display: 'none'}} ref={hiddenFileInput} onChange={handleFileChange} />
       </div>
-      {/* <div>
-        {
-          fullList.map(item => {
-            return (
-              <div key={item.name}>
-                <input type="checkbox" name="list" value={item.name} checked={checkList.includes(item.name)} onChange={changeList}/>
-                <span>{item.name}</span>
-              </div>
-            )
-          })
-        }
-      </div> */}
-      <div className={Modules.wrapper}>
-        {
-          // fullList.filter(item => checkList.includes(item.name)).map(item => {
-          //   const Component = item.c
-          //   return <Component isPlaying={isPlaying} data={audioData} key={item.name} />
-          // })
-          // fullList.map(item => {
-          //   const Component = item.c
-          //   const show = checkList.includes(item.name)
-          //   return <Component isPlaying={isPlaying} data={audioData} key={item.name} show={show} />
-          // })
-        }
+      <div className={Modules.audioWrapper}>
+        <audio controls onPlay={play} onPause={pause} ref={audio} src={audioURL} crossOrigin="anonymous"></audio>
+      </div>
+      <div className={Modules.exampleWrapper}>
         <SLine isPlaying={isPlaying} data={audioData} />
         <SPathDouble isPlaying={isPlaying} data={audioData} />
         <SPath isPlaying={isPlaying} data={audioData} />

@@ -3,6 +3,7 @@ import { Canvas, IShape } from '@antv/g-canvas';
 import { formatToTransit, addColorOpacity } from '../utils'
 import { line, curveCardinalClosed } from 'd3'
 import { getImageCircle } from '../utils/base';
+import { X, Y, R } from '../utils/constanst'
 interface SPathFillProps {
   isPlaying: boolean;
   data: number[];
@@ -10,9 +11,6 @@ interface SPathFillProps {
 
 export default function SLine(props: SPathFillProps) {
   const POINT_NUM = 64
-  const X = 200
-  const Y = 200
-  const R = 100
   const POINT_OFFSET = 60
   // const COLORS = ['#cdf5dd', '#e8fdc8', '#dafcf0', '#f3f8c9']
   const COLORS = ['#81D8F2', '#67A1E0', '#5263C2', '#74E1A5']
@@ -58,8 +56,8 @@ export default function SLine(props: SPathFillProps) {
   useEffect(() => {
     canvas.current = new Canvas({
       container: 'SPathFill',
-      width: 400,
-      height: 400,
+      width: 2 * X,
+      height: 2 * Y,
     });
 
     circle.current = getImageCircle(canvas.current, {

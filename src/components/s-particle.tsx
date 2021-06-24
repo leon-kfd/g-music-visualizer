@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Canvas, IShape } from '@antv/g-canvas';
 import { getImageCircle } from '../utils/base'
+import { X, Y, R } from '../utils/constanst'
 
 interface SPaticle {
   isPlaying: boolean;
@@ -9,10 +10,7 @@ interface SPaticle {
 
 export default function SPaticle(props: SPaticle) {
   const POINT_NUM = 64
-  const PARTICLE_NUM = 8
-  const X = 200
-  const Y = 200
-  const R = 100
+  const PARTICLE_NUM = 12
   const OFFSET = 0
   const POINT_MOVE_LENGTH = 18
   const POINT_ACTIVE_MOVE_LENGTH = 48
@@ -55,8 +53,8 @@ export default function SPaticle(props: SPaticle) {
     if (!canvas.current) {
       canvas.current = new Canvas({
         container: 'SParticle',
-        width: 400,
-        height: 400,
+        width: 2 * X,
+        height: 2 * Y,
       });
 
       circle.current = getImageCircle(canvas.current, {

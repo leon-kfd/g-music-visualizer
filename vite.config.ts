@@ -10,5 +10,14 @@ export default defineConfig({
       '@': resolve(__dirname, 'src')
     }
   },
-  plugins: [reactRefresh()]
+  plugins: [reactRefresh()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://kongfandong.cn',
+        changeOrigin: true,
+        rewrite: (path: string) => path.replace(/^\/api/, '')
+      }
+    }
+  }
 })

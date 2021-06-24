@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from "react";
 import { Canvas } from '@antv/g-canvas';
-import { formatToTransit } from '../utils'
+// import { formatToTransit } from '../utils'
 import { IElement, IShape } from "@antv/g-canvas/lib/types";
 import { getImageCircle } from '../utils/base';
+import { X, Y, R } from '../utils/constanst'
 interface SDotProps {
   isPlaying: boolean;
   data: number[];
@@ -10,16 +11,13 @@ interface SDotProps {
 
 export default function SDot(props: SDotProps) {
   const POINT_NUM = 64
-  const X = 200
-  const Y = 200
-  const R = 100
   const OFFSET = 10
   const DOT_R = 2
   const DOT_COLOR = '#e9dcf7'
   const DOT_OFFSET = 24
-  const SHADOW_OFFSET = 5
-  const SHADOW_BLUR = 4
-  const SHADOW_COLOR = '#22aaff'
+  // const SHADOW_OFFSET = 5
+  // const SHADOW_BLUR = 4
+  // const SHADOW_COLOR = '#22aaff'
   
 
   const canvas = useRef<Canvas>()
@@ -61,8 +59,8 @@ export default function SDot(props: SDotProps) {
   useEffect(() => {
     canvas.current = new Canvas({
       container: 'SDot',
-      width: 400,
-      height: 400,
+      width: 2 * X,
+      height: 2 * Y,
     });
 
     circle.current = getImageCircle(canvas.current, {
