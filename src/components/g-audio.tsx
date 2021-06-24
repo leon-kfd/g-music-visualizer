@@ -53,7 +53,7 @@ export default function GAudio() {
       const res2 = await fetch(`${apiURL}/api/neteaseMusic?target=${url}`)
       const { url: redirect } = await res2.json()
       setMusicName(`${name}-${artistsname}`)
-      setAudioURL(redirect)
+      setAudioURL(redirect.replace('http:', ''))
     } catch(e) {
       console.error(e)
       alert('Load error...')
