@@ -25,6 +25,9 @@ export default function SPaticle(props: SPaticle) {
 
   const currentActiveIndex = useRef<number>(-1)
   const timer = useRef<number>()
+
+  const isPlaying = useRef(false)
+
   useEffect(() => {
     if (props.isPlaying && props.data && props.data.length) {
       if (timer.current) {
@@ -127,6 +130,7 @@ export default function SPaticle(props: SPaticle) {
           item.resumeAnimate()
         } else {
           setTimeout(() => {
+            if (!isPlaying.current) return
             item.resumeAnimate()
             particleStartArr.current[index] = true 
           }, Math.random() * POINT_CREATE_DELAY)
@@ -142,6 +146,7 @@ export default function SPaticle(props: SPaticle) {
   }, [props.isPlaying])
 
   useEffect(() => {
+    isPlaying.current = props.isPlaying
     setTimeout(() => {
       if (props.isPlaying) {
         circle.current?.resumeAnimate()

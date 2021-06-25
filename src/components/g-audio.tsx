@@ -52,11 +52,14 @@ export default function GAudio() {
       const { name, url, artistsname, picurl } = data
       const res2 = await fetch(`${apiURL}/api/neteaseMusic?target=${url}`)
       const { url: redirect } = await res2.json()
-      setMusicName(`${name}-${artistsname}`)
+      setMusicName(`${name} - ${artistsname}`)
       setAudioURL(redirect)
+      pause()
     } catch(e) {
       console.error(e)
-      alert('Load error...')
+      audio.current?.pause()
+      pause()
+      alert('API busy...')
     }
   }
 
@@ -91,6 +94,11 @@ export default function GAudio() {
         <SPaticle isPlaying={isPlaying} data={audioData} />
         <SDot isPlaying={isPlaying} data={audioData} />
         <SPathDot isPlaying={isPlaying} data={audioData} />
+        {
+          Array.from({length: 5}).map((item,index) => {
+            return <div key={index} className="s-module-fake"></div>
+          })
+        }
       </div>
     </>
   )

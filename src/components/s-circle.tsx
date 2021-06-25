@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Canvas, IShape } from '@antv/g-canvas';
 import { getCirclePath } from '../utils'
 import { getImageCircle } from '../utils/base';
@@ -25,6 +25,8 @@ export default function SCircle(props: SCircleProps) {
   const circleArrStart = useRef<boolean[]>([])
 
   const realtimeData = useRef<number[]>([])
+
+  const isPlaying = useRef(false)
 
   // 拾取初始角度
   const pickStartPoint = () => {
@@ -128,9 +130,10 @@ export default function SCircle(props: SCircleProps) {
           circleDotArr.current[i].resumeAnimate()
         } else {
           setTimeout(() => {
+            if (!isPlaying.current) return
             circleArr.current[i].resumeAnimate()
             circleDotArr.current[i].resumeAnimate()
-            circleArrStart.current[i] = true 
+            circleArrStart.current[i] = true
           }, i * CIRCLE_DELAY)
         }
       }
@@ -145,6 +148,7 @@ export default function SCircle(props: SCircleProps) {
   }, [props.isPlaying])
 
   useEffect(() => {
+    isPlaying.current = props.isPlaying
     setTimeout(() => {
       if (props.isPlaying) {
         circle.current?.resumeAnimate()
