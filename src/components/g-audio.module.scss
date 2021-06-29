@@ -1,17 +1,36 @@
-.operationWrapper {
-  padding: 0 10px;
+.page {
+  min-height: calc(100vh - 40px);
+  .operationWrapper {
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .audioWrapper {
+    padding: 0 20px;
+    margin: 10px 0;
+  }
+  .exampleWrapper {
+    padding: 0 10px;
+    display: flex;
+    flex-wrap: wrap;
+    transform: translate3d(0, 0, 0);
+    justify-content: space-around;
+  }
+}
+.footer {
+  height: 40px;
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-}
-.audioWrapper {
-  padding: 0 20px;
-  margin: 10px 0;
-}
-.exampleWrapper {
-  padding: 0 10px;
-  display: flex;
-  flex-wrap: wrap;
-  transform: translate3d(0, 0, 0);
-  justify-content: space-around;
+  justify-content: center;
+  color: #889;
+  a {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    color: #889;
+    &.github {
+      margin-left: 20px;
+    }
+  }
 }
