@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { Canvas, IShape } from '@antv/g-canvas';
 import { getCirclePath } from '../utils'
 import { getImageCircle } from '../utils/base';

@@ -78,7 +78,7 @@ export default function GAudio() {
     <>
       <main className={style.page}>
         <div className={style.operationWrapper}>
-          <button className="btn m10" onClick={handleLoadRandomMusic}>Random a online music</button>
+          <button className="btn m10" onClick={handleLoadRandomMusic}>Random an online music</button>
           <button className="btn m10" onClick={handleChooseRandomMusic}>Choose a local muisc</button>
           <div className="strong-text m10" style={{minWidth: '200px'}}>{musicName}</div>
           <input type="file" style={{display: 'none'}} ref={hiddenFileInput} onChange={handleFileChange} />
