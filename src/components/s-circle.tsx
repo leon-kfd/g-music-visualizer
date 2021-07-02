@@ -15,6 +15,7 @@ export default function SCircle(props: SCircleProps) {
   const DOT_R = 5
   const CIRCLE_NUM = 3
   const CIRCLE_DELAY = 2000
+  const CIRCLE_SCALE_OFFSET = 80
 
   const canvas = useRef<Canvas>()
   const circle = useRef<IShape>()
@@ -63,12 +64,15 @@ export default function SCircle(props: SCircleProps) {
       })
 
       const addCircle = () => {
-        return (canvas.current as Canvas).addShape('path', {
+        return (canvas.current as Canvas).addShape('circle', {
           attrs: {
             stroke: LINE_COLOR,
             lineWidth: 2,
-            path: getCirclePath(X, Y, R),
-            opacity: 0
+            opacity: 0,
+            x: X,
+            y: Y,
+            r: R
+            //path: getCirclePath(X, Y, R),
           }
         })
       };
@@ -96,7 +100,8 @@ export default function SCircle(props: SCircleProps) {
         circleArr.current.push(addCircle())
         circleArr.current[index].animate((ratio: number) => {
           return {
-            path: getCirclePath(X, Y, R + ratio * 80),
+            r: R + ratio * CIRCLE_SCALE_OFFSET,
+            // path: getCirclePath(X, Y, R + ratio * 80),
             opacity: ratio > 0.02 && ratio < 0.9 ? 0.8 - ratio * 0.8 : 0
           }
         }, animateOption)
@@ -112,7 +117,7 @@ export default function SCircle(props: SCircleProps) {
           const deg = circleDotDegArr.current[index] + ratio * 360 - 180
           const l = Math.cos(deg * Math.PI / 180)
           const t = Math.sin(deg * Math.PI / 180)
-          const r = R + ratio * 80
+          const r = R + ratio * CIRCLE_SCALE_OFFSET
           return {
             x: X + l * r,
             y: Y + t * r,

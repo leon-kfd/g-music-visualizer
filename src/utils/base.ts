@@ -1,4 +1,4 @@
-import { Canvas, IShape } from "@antv/g-canvas";
+import { Canvas } from "@antv/g-canvas";
 import { ext } from '@antv/matrix-util';
 
 const { transform } = ext
