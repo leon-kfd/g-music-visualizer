@@ -4,12 +4,9 @@ import { IElement } from "@antv/g-canvas/lib/types";
 import { line, curveCardinalClosed } from 'd3';
 import { getImageCircle } from '../utils/base';
 import { X, Y, R } from '../utils/constanst'
-interface SPathDotProps {
-  isPlaying: boolean;
-  data: number[];
-}
+import useAudioImg from "@/hooks/useAudioImg";
 
-export default function SPathDot(props: SPathDotProps) {
+export default function SPathDot(props: SComponentProps) {
   const POINT_NUM = 128
   const PACE_NUM = 8 // 曲率优化跳点数, 2 ** n
   const JUME_OFFSET = 36 // 波动幅度
@@ -104,15 +101,7 @@ export default function SPathDot(props: SPathDotProps) {
     })
   }, [])
 
-  useEffect(() => {
-    setTimeout(() => {
-      if (props.isPlaying) {
-        circle.current?.resumeAnimate()
-      } else {
-        circle.current?.pauseAnimate()
-      }
-    })
-  }, [props.isPlaying])
+  useAudioImg(canvas, circle, props.isPlaying, props.audioImg)
 
   return (
     <div className="s-model">

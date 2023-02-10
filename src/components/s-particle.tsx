@@ -2,13 +2,9 @@ import React, { useEffect, useRef } from 'react';
 import { Canvas, IShape } from '@antv/g-canvas';
 import { getImageCircle } from '../utils/base'
 import { X, Y, R } from '../utils/constanst'
+import useAudioImg from "@/hooks/useAudioImg";
 
-interface SPaticle {
-  isPlaying: boolean;
-  data: number[];
-}
-
-export default function SPaticle(props: SPaticle) {
+export default function SPaticle(props: SComponentProps) {
   const POINT_NUM = 64
   const PARTICLE_NUM = 12
   const OFFSET = 0
@@ -147,14 +143,9 @@ export default function SPaticle(props: SPaticle) {
 
   useEffect(() => {
     isPlaying.current = props.isPlaying
-    setTimeout(() => {
-      if (props.isPlaying) {
-        circle.current?.resumeAnimate()
-      } else {
-        circle.current?.pauseAnimate()
-      }
-    })
   }, [props.isPlaying])
+
+  useAudioImg(canvas, circle, props.isPlaying, props.audioImg)
 
   return (
     <div className="s-model">

@@ -3,13 +3,10 @@ import { Canvas } from '@antv/g-canvas';
 // import { formatToTransit } from '../utils'
 import { IElement, IShape } from "@antv/g-canvas/lib/types";
 import { getImageCircle } from '../utils/base';
-import { X, Y, R } from '../utils/constanst'
-interface SDotProps {
-  isPlaying: boolean;
-  data: number[];
-}
+import { X, Y, R } from '../utils/constanst';
+import useAudioImg from "@/hooks/useAudioImg";
 
-export default function SDot(props: SDotProps) {
+export default function SDot(props: SComponentProps) {
   const POINT_NUM = 64
   const OFFSET = 10
   const DOT_R = 2
@@ -113,15 +110,7 @@ export default function SDot(props: SDotProps) {
     })
   }, [])
 
-  useEffect(() => {
-    setTimeout(() => {
-      if (props.isPlaying) {
-        circle.current?.resumeAnimate()
-      } else {
-        circle.current?.pauseAnimate()
-      }
-    })
-  }, [props.isPlaying])
+  useAudioImg(canvas, circle, props.isPlaying, props.audioImg)
 
   return (
     <div className="s-model">

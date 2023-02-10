@@ -3,13 +3,9 @@ import { Canvas, IShape } from '@antv/g-canvas';
 import { getCirclePath } from '../utils'
 import { getImageCircle } from '../utils/base';
 import { X, Y, R } from '../utils/constanst'
+import useAudioImg from "@/hooks/useAudioImg";
 
-interface SCircleProps {
-  isPlaying: boolean;
-  data: number[];
-}
-
-export default function SCircle(props: SCircleProps) {
+export default function SCircle(props: SComponentProps) {
   const LINE_COLOR = '#fff'
   const DOT_COLOR = '#e9dcf7'
   const DOT_R = 5
@@ -154,14 +150,9 @@ export default function SCircle(props: SCircleProps) {
 
   useEffect(() => {
     isPlaying.current = props.isPlaying
-    setTimeout(() => {
-      if (props.isPlaying) {
-        circle.current?.resumeAnimate()
-      } else {
-        circle.current?.pauseAnimate()
-      }
-    })
   }, [props.isPlaying])
+
+  useAudioImg(canvas, circle, props.isPlaying, props.audioImg)
 
   return (
     <div className="s-model">

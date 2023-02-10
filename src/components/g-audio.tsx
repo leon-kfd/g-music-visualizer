@@ -12,6 +12,7 @@ import SPaticle from "./s-particle";
 import { apiURL } from '@/global'
 
 export const MusicVisualizerCtx = new MusicVisualizer()
+
 export default function GAudio() {
   const audio = useRef<HTMLAudioElement>(null)
   useEffect(() => {
@@ -21,6 +22,7 @@ export default function GAudio() {
   const [musicName, setMusicName] = useState('Please load a music...')
   const [audioURL, setAudioURL] = useState<string>()
   const [audioData, setAudioData] = useState<number[]>([])
+  const [audioImg, setAudioImg] = useState<string>()
   const [isPlaying, setIsPlaying] = useState(false)
 
   const hiddenFileInput = useRef<HTMLInputElement>(null)
@@ -47,13 +49,14 @@ export default function GAudio() {
 
   async function handleLoadRandomMusic() {
     try {
-      const res1 = await fetch('https://api.uomg.com/api/rand.music?sort=%E7%83%AD%E6%AD%8C%E6%A6%9C&format=json')
-      const { data } = await res1.json()
+      const transferTarget = encodeURIComponent(`https://api.wqwlkj.cn/wqwlapi/wyy_random.php?type=json`)
+      const res = await fetch(`${apiURL}/api/transfer?target=${transferTarget}`, { headers: { 'content-type': 'application/json; charset=utf-8' } })
+      const { data } = await res.json()
+      console.log('data', data)
       const { name, url, artistsname, picurl } = data
-      const res2 = await fetch(`${apiURL}/api/neteaseMusic?target=${url}`)
-      const { url: redirect } = await res2.json()
       setMusicName(`${name} - ${artistsname}`)
-      setAudioURL(redirect.replace('http:', ''))
+      setAudioURL(url)
+      setAudioImg(picurl)
       pause()
     } catch(e) {
       console.error(e)
@@ -87,14 +90,14 @@ export default function GAudio() {
           <audio controls onPlay={play} onPause={pause} ref={audio} src={audioURL} crossOrigin="anonymous"></audio>
         </div>
         <div className={style.exampleWrapper}>
-          <SLine isPlaying={isPlaying} data={audioData} />
-          <SPathDouble isPlaying={isPlaying} data={audioData} />
-          <SPath isPlaying={isPlaying} data={audioData} />
-          <SPathFill isPlaying={isPlaying} data={audioData} />
-          <SCircle isPlaying={isPlaying} data={audioData} />
-          <SPaticle isPlaying={isPlaying} data={audioData} />
-          <SDot isPlaying={isPlaying} data={audioData} />
-          <SPathDot isPlaying={isPlaying} data={audioData} />
+          <SLine isPlaying={isPlaying} data={audioData} audioImg={audioImg}/>
+          <SPathDouble isPlaying={isPlaying} data={audioData} audioImg={audioImg}/>
+          <SPath isPlaying={isPlaying} data={audioData} audioImg={audioImg}/>
+          <SPathFill isPlaying={isPlaying} data={audioData} audioImg={audioImg}/>
+          <SCircle isPlaying={isPlaying} data={audioData} audioImg={audioImg}/>
+          <SPaticle isPlaying={isPlaying} data={audioData} audioImg={audioImg}/>
+          <SDot isPlaying={isPlaying} data={audioData} audioImg={audioImg}/>
+          <SPathDot isPlaying={isPlaying} data={audioData} audioImg={audioImg}/>
           {
             Array.from({length: 5}).map((item,index) => {
               return <div key={index} className="s-module-fake"></div>

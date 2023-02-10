@@ -4,12 +4,9 @@ import { formatToTransit } from '../utils'
 import { line, curveCardinalClosed } from 'd3'
 import { getImageCircle } from '../utils/base';
 import { X, Y, R } from '../utils/constanst'
-interface SPathProps {
-  isPlaying: boolean;
-  data: number[];
-}
+import useAudioImg from "@/hooks/useAudioImg";
 
-export default function SPath(props: SPathProps) {
+export default function SPath(props: SComponentProps) {
   const POINT_NUM = 64
   const OFFSET = 4
   const POINT_OFFSET = 30
@@ -82,15 +79,7 @@ export default function SPath(props: SPathProps) {
     })
   }, [])
 
-  useEffect(() => {
-    setTimeout(() => {
-      if (props.isPlaying) {
-        circle.current?.resumeAnimate()
-      } else {
-        circle.current?.pauseAnimate()
-      }
-    })
-  }, [props.isPlaying])
+  useAudioImg(canvas, circle, props.isPlaying, props.audioImg)
 
   return (
     <div className="s-model">

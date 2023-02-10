@@ -4,12 +4,9 @@ import { IElement, IShape } from "@antv/g-canvas/lib/types";
 // import { formatToTransit } from '../utils'
 import { getImageCircle } from '../utils/base'
 import { X, Y, R } from '../utils/constanst'
-interface SLineProps {
-  isPlaying: boolean
-  data: number[];
-}
+import useAudioImg from "@/hooks/useAudioImg";
 
-export default function SLine(props: SLineProps) {
+export default function SLine(props: SComponentProps) {
   const POINT_NUM = 64
   const OFFSET = 10
   const RECT_WIDTH = 4
@@ -73,15 +70,7 @@ export default function SLine(props: SLineProps) {
     })
   }, [])
 
-  useEffect(() => {
-    setTimeout(() => {
-      if (props.isPlaying) {
-        circle.current?.resumeAnimate()
-      } else {
-        circle.current?.pauseAnimate()
-      }
-    })
-  }, [props.isPlaying])
+  useAudioImg(canvas, circle, props.isPlaying, props.audioImg)
 
   return (
     <div className="s-model">
