@@ -113,8 +113,6 @@ export default function SDot(props: SComponentProps) {
   useAudioImg(canvas, circle, props.isPlaying, props.audioImg)
 
   return (
-    <div className="s-model">
-      <div id="SDot" className="s-canvas-wrapper"></div>
-    </div>
+    <div id="SDot" className="s-canvas-wrapper"></div>
   )
 }

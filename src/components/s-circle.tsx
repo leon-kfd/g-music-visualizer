@@ -155,8 +155,6 @@ export default function SCircle(props: SComponentProps) {
   useAudioImg(canvas, circle, props.isPlaying, props.audioImg)
 
   return (
-    <div className="s-model">
-      <div id="SCircle" className="s-canvas-wrapper"></div>
-    </div>
+    <div id="SCircle" className="s-canvas-wrapper"></div>
   )
 }

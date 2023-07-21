@@ -31,7 +31,7 @@ export function getImageCircle(canvas: Canvas, { x, y, r, shadowColor }: ImageCi
       width: 2 * r,
       height: 2 * r,
       // img: `https://source.unsplash.com/random/${2 * r}x${2 * r}?Nature`
-      img: `https://howdz.deno.dev/unsplash/random?keyword=Nature&${2 * r}x${2 * r}`
+      // img: `https://howdz.deno.dev/unsplash/random?keyword=Nature&${2 * r}x${2 * r}`
     }
   })
   shape.setClip({

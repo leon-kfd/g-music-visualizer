@@ -82,8 +82,6 @@ export default function SPath(props: SComponentProps) {
   useAudioImg(canvas, circle, props.isPlaying, props.audioImg)
 
   return (
-    <div className="s-model">
-      <div id="SPath" className="s-canvas-wrapper"></div>
-    </div>
+    <div id="SPath" className="s-canvas-wrapper"></div>
   )
 }

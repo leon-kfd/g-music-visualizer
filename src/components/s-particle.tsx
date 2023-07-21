@@ -148,8 +148,6 @@ export default function SPaticle(props: SComponentProps) {
   useAudioImg(canvas, circle, props.isPlaying, props.audioImg)
 
   return (
-    <div className="s-model">
-      <div id="SParticle" className="s-canvas-wrapper"></div>
-    </div>
+    <div id="SParticle" className="s-canvas-wrapper"></div>
   )
 }

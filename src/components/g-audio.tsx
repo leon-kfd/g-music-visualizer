@@ -9,9 +9,11 @@ import SCircle from './s-circle'
 import SPathDouble from './s-path-double'
 import SDot from "./s-dot";
 import SPaticle from "./s-particle";
-import { apiURL } from '@/global'
+import { apiURL, DEFAULT_IMG } from '@/global'
 
 export const MusicVisualizerCtx = new MusicVisualizer()
+
+const exampleList = [SLine, SPathDouble, SPath, SPathFill, SCircle, SPaticle, SDot, SPathDot]
 
 export default function GAudio() {
   const audio = useRef<HTMLAudioElement>(null)
@@ -22,8 +24,9 @@ export default function GAudio() {
   const [musicName, setMusicName] = useState('Please load a music...')
   const [audioURL, setAudioURL] = useState<string>()
   const [audioData, setAudioData] = useState<number[]>([])
-  const [audioImg, setAudioImg] = useState<string>()
+  const [audioImg, setAudioImg] = useState<string>(DEFAULT_IMG)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [playList, setPlayList] = useState<any[]>([])
 
   const hiddenFileInput = useRef<HTMLInputElement>(null)
 
@@ -47,16 +50,49 @@ export default function GAudio() {
     raf.current && cancelAnimationFrame(raf.current)
   }
 
+  
+  async function getPlayList() {
+    try {
+      const res = await (await fetch(`https://api.injahow.cn/meting/?type=playlist&id=8577182717`)).json()
+      if (res && res.length > 0) {
+        console.log('res')
+        setPlayList(res)
+      }
+    } catch {
+      //
+    }
+  }
+  useEffect(() => {
+    getPlayList()
+  }, [])
+  
+
   async function handleLoadRandomMusic() {
     try {
-      const transferTarget = encodeURIComponent(`https://api.wqwlkj.cn/wqwlapi/wyy_random.php?type=json`)
-      const res = await fetch(`${apiURL}/api/transfer?target=${transferTarget}`, { headers: { 'content-type': 'application/json; charset=utf-8' } })
-      const { data } = await res.json()
-      console.log('data', data)
-      const { name, url, artistsname, picurl } = data
-      setMusicName(`${name} - ${artistsname}`)
-      setAudioURL(url)
-      setAudioImg(picurl)
+      let musicName = ''
+      let musicURL = ''
+      let posterPic = ''
+      if (playList && playList.length > 0) {
+        const randomIdx = ~~[Math.random() * playList.length]
+        const { name, url, artist, pic } = playList[randomIdx]
+        console.log('playList[randomIdx]', playList[randomIdx])
+        const { url: picURL } = await fetch(pic, { method: 'HEAD' })
+        console.log('picURL', picURL)
+        musicName = `${name} - ${artist}`
+        musicURL = url
+        posterPic = picURL.split('?')[0]
+      } else {
+        const transferTarget = encodeURIComponent(`https://api.wqwlkj.cn/wqwlapi/wyy_random.php?type=json`)
+        const res = await fetch(`${apiURL}/api/transfer?target=${transferTarget}`, { headers: { 'content-type': 'application/json; charset=utf-8' } })
+        const { data } = await res.json()
+        const { name, url, artistsname, picurl } = data
+        musicName = `${name} - ${artistsname}`
+        musicURL = url
+        posterPic = picurl
+      }
+      setMusicName(musicName)
+      setAudioURL(musicURL)
+      setAudioImg(posterPic)
       pause()
     } catch(e) {
       console.error(e)
@@ -90,14 +126,18 @@ export default function GAudio() {
           <audio controls onPlay={play} onPause={pause} ref={audio} src={audioURL} crossOrigin="anonymous"></audio>
         </div>
         <div className={style.exampleWrapper}>
-          <SLine isPlaying={isPlaying} data={audioData} audioImg={audioImg}/>
-          <SPathDouble isPlaying={isPlaying} data={audioData} audioImg={audioImg}/>
-          <SPath isPlaying={isPlaying} data={audioData} audioImg={audioImg}/>
-          <SPathFill isPlaying={isPlaying} data={audioData} audioImg={audioImg}/>
-          <SCircle isPlaying={isPlaying} data={audioData} audioImg={audioImg}/>
-          <SPaticle isPlaying={isPlaying} data={audioData} audioImg={audioImg}/>
-          <SDot isPlaying={isPlaying} data={audioData} audioImg={audioImg}/>
-          <SPathDot isPlaying={isPlaying} data={audioData} audioImg={audioImg}/>
+          {
+            exampleList.map((Example, index) => {
+              return (
+                <div className="s-model" key={index}>
+                  <div className="img-bg-wrapper">
+                    <img src={audioImg} />
+                  </div>
+                  <Example isPlaying={isPlaying} data={audioData} audioImg={audioImg} />
+                </div>
+              )
+            })
+          }
           {
             Array.from({length: 5}).map((item,index) => {
               return <div key={index} className="s-module-fake"></div>

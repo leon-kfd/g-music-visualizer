@@ -83,8 +83,6 @@ export default function SLine(props: SComponentProps) {
   useAudioImg(canvas, circle, props.isPlaying, props.audioImg)
 
   return (
-    <div className="s-model">
-      <div id="SPathFill" className="s-canvas-wrapper"></div>
-    </div>
+    <div id="SPathFill" className="s-canvas-wrapper"></div>
   )
 }

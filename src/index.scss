@@ -78,16 +78,18 @@ ul, li {
   box-shadow: 0 0 10px #eee;
   overflow: hidden;
   margin: 12px;
-  &:before {
-    content: '';
+  .img-bg-wrapper {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: url(https://source.unsplash.com/random/300x300?Nature);
-    filter: blur(40px);
     z-index: 1;
+    img {
+      width: 100%;
+      height: 100%;
+      filter: blur(40px);
+    }
   }
   .s-canvas-wrapper {
     position: absolute;
