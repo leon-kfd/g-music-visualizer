@@ -2,18 +2,20 @@ import React, { useEffect, useRef, useState } from "react";
 import { MusicVisualizer } from '../plugins/MusicVisualizer'
 import style from './g-audio.module.scss'
 import SLine from './s-line'
-import SPath from './s-path'
-import SPathDot from './s-path-dot'
-import SPathFill from './s-path-fill'
-import SCircle from './s-circle'
-import SPathDouble from './s-path-double'
-import SDot from "./s-dot";
-import SPaticle from "./s-particle";
+// import SPath from './s-path'
+// import SPathDot from './s-path-dot'
+// import SPathFill from './s-path-fill'
+// import SCircle from './s-circle'
+// import SPathDouble from './s-path-double'
+// import SDot from "./s-dot";
+// import SPaticle from "./s-particle";
 import { apiURL, DEFAULT_IMG } from '@/global'
 
 export const MusicVisualizerCtx = new MusicVisualizer()
 
-const exampleList = [SLine, SPathDouble, SPath, SPathFill, SCircle, SPaticle, SDot, SPathDot]
+// const exampleList = [SLine, SPathDouble, SPath, SPathFill, SCircle, SPaticle, SDot, SPathDot]
+
+const exampleList = [SLine]
 
 export default function GAudio() {
   const audio = useRef<HTMLAudioElement>(null)
