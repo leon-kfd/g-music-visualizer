@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import { Canvas, IShape } from '@antv/g-canvas';
-import { getCirclePath } from '../utils'
+import { Canvas, Image, Circle, Path } from '@antv/g';
+import { Renderer } from '@antv/g-canvas';
 import { getImageCircle } from '../utils/base';
 import { X, Y, R } from '../utils/constanst'
 import useAudioImg from "@/hooks/useAudioImg";
@@ -14,10 +14,10 @@ export default function SCircle(props: SComponentProps) {
   const CIRCLE_SCALE_OFFSET = 80
 
   const canvas = useRef<Canvas>()
-  const circle = useRef<IShape>()
+  const circle = useRef<Image>()
 
-  const circleArr = useRef<IShape[]>([])
-  const circleDotArr = useRef<IShape[]>([])
+  const circleArr = useRef<Circle[]>([])
+  const circleDotArr = useRef<Circle[]>([])
   const circleDotDegArr = useRef<number[]>([])
   const circleArrStart = useRef<boolean[]>([])
 
@@ -50,6 +50,7 @@ export default function SCircle(props: SComponentProps) {
         container: 'SCircle',
         width: 2 * X,
         height: 2 * Y,
+        renderer: new Renderer()
       });
 
       circle.current = getImageCircle(canvas.current, {
@@ -60,23 +61,24 @@ export default function SCircle(props: SComponentProps) {
       })
 
       const addCircle = () => {
-        return (canvas.current as Canvas).addShape('circle', {
-          attrs: {
+        const circle = new Circle({
+          style: {
             stroke: LINE_COLOR,
             lineWidth: 2,
             opacity: 0,
-            x: X,
-            y: Y,
+            cx: X,
+            cy: Y,
             r: R
-            //path: getCirclePath(X, Y, R),
           }
         })
+        canvas.current?.appendChild(circle)
+        return circle
       };
       const addCircleDot = () => {
-        return (canvas.current as Canvas).addShape('circle', {
-          attrs: {
-            x: X,
-            y: Y - R,
+        const circleDot = new Circle({
+          style: {
+            cx: X,
+            cy: Y - R,
             r: DOT_R,
             fill: LINE_COLOR,
             shadowColor: DOT_COLOR,
@@ -84,6 +86,8 @@ export default function SCircle(props: SComponentProps) {
             opacity: 0
           }
         })
+        canvas.current?.appendChild(circleDot)
+        return circleDot
       }
       const animateOption = {
         duration: 6000,

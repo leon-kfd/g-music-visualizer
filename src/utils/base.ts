@@ -43,7 +43,7 @@ export function getImageCircle(canvas: Canvas, { x, y, r, shadowColor }: ImageCi
     { transform: 'rotate(0)' }, 
     { transform: 'rotate(360deg)' }
   ], {
-    duration: 10000,
+    duration: 12000,
     iterations: Infinity
   })
 

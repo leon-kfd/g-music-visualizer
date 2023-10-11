@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Canvas, Image, Rect, DisplayObject } from '@antv/g';
+import { Canvas, Image, Rect } from '@antv/g';
 import { Renderer } from '@antv/g-canvas';
 // import { formatToTransit } from '../utils'
 import { getImageCircle } from '../utils/base'
@@ -14,7 +14,7 @@ export default function SLine(props: SComponentProps) {
 
   const canvas = useRef<Canvas>()
   const circle = useRef<Image>()
-  const sArr = useRef<DisplayObject[]>([])
+  const sArr = useRef<Rect[]>([])
 
   function getArray(arr: number[]) {
     const filterArr = arr.reduce((prev: number[], curr: number, index: number) => {

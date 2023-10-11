@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import { Canvas, IShape } from '@antv/g-canvas';
+import { Canvas, Image, Path } from '@antv/g';
+import { Renderer } from '@antv/g-canvas';
 import { formatToTransit } from '../utils'
 import { line, curveCardinalClosed } from 'd3'
 import { getImageCircle } from '../utils/base';
@@ -14,8 +15,8 @@ export default function SPath(props: SComponentProps) {
   // const COLORS = ['#4E4BD7', '#BB4BD7', '#4BD773', '#D7544B']
 
   const canvas = useRef<Canvas>()
-  const circle = useRef<IShape>()
-  const sPathArr = useRef<IShape[]>([])
+  const circle = useRef<Image>()
+  const sPathArr = useRef<Path[]>([])
 
   function getArray(arr: number[]) {
     let _arr: number[] = [];
@@ -43,7 +44,9 @@ export default function SPath(props: SComponentProps) {
       })
       pathArr.map((item,index) => {
         const path = line().x((d: [number,number]) => d[0]).y((d: [number, number]) => d[1]).curve(curveCardinalClosed)(item)
-        sPathArr.current[index]?.attr('path', path)
+        if (path) {
+          sPathArr.current[index]?.attr('path', path)
+        }
       })
     }
   }, [
@@ -55,6 +58,7 @@ export default function SPath(props: SComponentProps) {
       container: 'SPath',
       width: 2 * X,
       height: 2 * Y,
+      renderer: new Renderer()
     });
 
     circle.current = getImageCircle(canvas.current, {
@@ -69,13 +73,17 @@ export default function SPath(props: SComponentProps) {
     })
     const path = line().x((d: [number,number]) => d[0]).y((d: [number, number]) => d[1]).curve(curveCardinalClosed)(PointArr)
     Array.from({ length: 4 }, (item, index: number) => {
-      sPathArr.current.push((canvas.current as Canvas).addShape('path', {
-        attrs: {
-          stroke: COLORS[index],
-          lineWidth: 1,
-          path
-        }
-      }))
+      if (path) {
+        const pathEl = new Path({
+          style: {
+            stroke: COLORS[index],
+            lineWidth: 1,
+            path
+          }
+        })
+        canvas.current?.appendChild(pathEl)
+        sPathArr.current.push(pathEl)
+      }
     })
   }, [])
 
