@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Canvas, Image, Circle, Path } from '@antv/g';
+import { Canvas, Image, Circle, Group } from '@antv/g';
 import { Renderer } from '@antv/g-canvas';
 import { getImageCircle } from '../utils/base';
 import { X, Y, R } from '../utils/constanst'
@@ -11,12 +11,12 @@ export default function SCircle(props: SComponentProps) {
   const DOT_R = 5
   const CIRCLE_NUM = 3
   const CIRCLE_DELAY = 2000
-  const CIRCLE_SCALE_OFFSET = 80
+  const CIRCLE_SCALE_RARIO = 2
 
   const canvas = useRef<Canvas>()
   const circle = useRef<Image>()
 
-  const circleArr = useRef<Circle[]>([])
+  const circleArr = useRef<Group[]>([])
   const circleDotArr = useRef<Circle[]>([])
   const circleDotDegArr = useRef<number[]>([])
   const circleArrStart = useRef<boolean[]>([])
@@ -65,79 +65,84 @@ export default function SCircle(props: SComponentProps) {
           style: {
             stroke: LINE_COLOR,
             lineWidth: 2,
-            opacity: 0,
+            opacity: 1,
             cx: X,
             cy: Y,
-            r: R
+            r: R,
           }
         })
-        canvas.current?.appendChild(circle)
-        return circle
-      };
-      const addCircleDot = () => {
-        const circleDot = new Circle({
+        // const circleDot = new Circle({
+        //   style: {
+        //     cx: X,
+        //     cy: Y,
+        //     r: DOT_R,
+        //     fill: LINE_COLOR,
+        //     shadowColor: DOT_COLOR,
+        //     shadowBlur: DOT_R,
+        //     opacity: 1,
+        //     transform: `translate(${R}, 0)`
+        //   }
+        // })
+        const group = new Group({
           style: {
-            cx: X,
-            cy: Y - R,
-            r: DOT_R,
-            fill: LINE_COLOR,
-            shadowColor: DOT_COLOR,
-            shadowBlur: DOT_R,
-            opacity: 0
+            x: 0,
+            y: 0
           }
         })
-        canvas.current?.appendChild(circleDot)
-        return circleDot
-      }
+        // group.style.transform = `rotate(180deg) scale(1.5)`
+        group.appendChild(circle)
+        group.scaleLocal(1)
+        // group.appendChild(circleDot)
+        canvas.current?.appendChild(group)
+        return group
+      };
       const animateOption = {
-        duration: 6000,
-        easing: 'easeLinear',
-        repeat: true
+        duration: CIRCLE_DELAY * CIRCLE_NUM,
+        iterations: Infinity
       }
       Array.from({ length: CIRCLE_NUM }, (item, index) => {
         circleArrStart.current.push(false)
-        // circle
         circleArr.current.push(addCircle())
-        circleArr.current[index].animate((ratio: number) => {
-          return {
-            r: R + ratio * CIRCLE_SCALE_OFFSET,
-            // path: getCirclePath(X, Y, R + ratio * 80),
-            opacity: ratio > 0.02 && ratio < 0.9 ? 0.8 - ratio * 0.8 : 0
-          }
-        }, animateOption)
+        // circleArr.current[index].animate(
+        //   [
+        //     { transform: 'scale(1)', opacity: 0.8 },
+        //     { transform: `scale(${CIRCLE_SCALE_RARIO})`, opacity: 0 }
+        //   ],
+        //   animateOption
+        // )
         // circle-dot
-        circleDotArr.current.push(addCircleDot())
-        circleDotDegArr.current.push(0)
-        circleDotArr.current[index].animate((ratio: number) => {
-          if (props.data && ratio < 0.05 && !circleDotDegArr.current[index]) {
-            circleDotDegArr.current[index] = pickStartPoint()
-          } else if (ratio > 0.9) {
-            circleDotDegArr.current[index] = 0
-          }
-          const deg = circleDotDegArr.current[index] + ratio * 360 - 180
-          const l = Math.cos(deg * Math.PI / 180)
-          const t = Math.sin(deg * Math.PI / 180)
-          const r = R + ratio * CIRCLE_SCALE_OFFSET
-          return {
-            x: X + l * r,
-            y: Y + t * r,
-            r: DOT_R * (1 - ratio / 2),
-            opacity: ratio > 0.05 && ratio < 0.9 ? 0.8 - ratio * 0.8 : 0
-          }
-        }, animateOption)
+        // circleDotArr.current.push(addCircleDot())
+        // circleDotDegArr.current.push(0)
+        // circleDotArr.current[index].animate((ratio: number) => {
+        //   if (props.data && ratio < 0.05 && !circleDotDegArr.current[index]) {
+        //     circleDotDegArr.current[index] = pickStartPoint()
+        //   } else if (ratio > 0.9) {
+        //     circleDotDegArr.current[index] = 0
+        //   }
+        //   const deg = circleDotDegArr.current[index] + ratio * 360 - 180
+        //   const l = Math.cos(deg * Math.PI / 180)
+        //   const t = Math.sin(deg * Math.PI / 180)
+        //   const r = R + ratio * CIRCLE_SCALE_OFFSET
+        //   return {
+        //     x: X + l * r,
+        //     y: Y + t * r,
+        //     r: DOT_R * (1 - ratio / 2),
+        //     opacity: ratio > 0.05 && ratio < 0.9 ? 0.8 - ratio * 0.8 : 0
+        //   }
+        // }, animateOption)
       })
     }
 
     if (props.isPlaying) {
       for(let i = 0; i < circleArr.current.length; i++) {
         if (circleArrStart.current[i]) {
-          circleArr.current[i].resumeAnimate()
-          circleDotArr.current[i].resumeAnimate()
+          // circleArr.current[i].getAnimations()?.[0]?.pause()
+          // circleDotArr.current[i].resumeAnimate()
         } else {
           setTimeout(() => {
             if (!isPlaying.current) return
-            circleArr.current[i].resumeAnimate()
-            circleDotArr.current[i].resumeAnimate()
+            circleArr.current[i].getAnimations()?.[0]?.play()
+            // circleDotArr.current[i].resumeAnimate()
             circleArrStart.current[i] = true
           }, i * CIRCLE_DELAY)
         }
@@ -145,8 +150,8 @@ export default function SCircle(props: SComponentProps) {
     } else {
       setTimeout(() => {
         for(let i = 0; i < circleArr.current.length; i++) {
-          circleArr.current[i].pauseAnimate()
-          circleDotArr.current[i].pauseAnimate()
+          circleArr.current[i].getAnimations()?.[0]?.pause()
+          // circleDotArr.current[i].pauseAnimate()
         }
       })
     }

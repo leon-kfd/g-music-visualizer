@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
-import { Canvas } from '@antv/g-canvas';
+import { Canvas, Image, Circle, Line } from '@antv/g';
+import { Renderer } from '@antv/g-canvas'
 // import { formatToTransit } from '../utils'
-import { IElement, IShape } from "@antv/g-canvas/lib/types";
 import { getImageCircle } from '../utils/base';
 import { X, Y, R } from '../utils/constanst';
 import useAudioImg from "@/hooks/useAudioImg";
@@ -18,10 +18,10 @@ export default function SDot(props: SComponentProps) {
   
 
   const canvas = useRef<Canvas>()
-  const circle = useRef<IShape>()
+  const circle = useRef<Image>()
 
-  const sArr = useRef<IElement[]>([])
-  const lArr = useRef<IElement[]>([])
+  const sArr = useRef<Circle[]>([])
+  const lArr = useRef<Line[]>([])
 
   function getArray(arr: number[]) {
     // return formatToTransit(arr, 13, 0.92)
@@ -43,8 +43,8 @@ export default function SDot(props: SComponentProps) {
     if (props.data?.length) {
       getArray(props.data).map((item,index) => {
         const [x, y] = getPointByIndex(index, item * item / 65025 * DOT_OFFSET + 4)
-        sArr.current[index].attr('x', x)
-        sArr.current[index].attr('y', y)
+        sArr.current[index].attr('cx', x)
+        sArr.current[index].attr('cy', y)
         lArr.current[index].attr('x2', x)
         lArr.current[index].attr('y2', y)
       })
@@ -58,6 +58,7 @@ export default function SDot(props: SComponentProps) {
       container: 'SDot',
       width: 2 * X,
       height: 2 * Y,
+      renderer: new Renderer()
     });
 
     circle.current = getImageCircle(canvas.current, {
@@ -67,36 +68,19 @@ export default function SDot(props: SComponentProps) {
       shadowColor: DOT_COLOR
     })
 
-    // sArr.current = Array.from({ length: POINT_NUM }, (item, index: number) => {
-    //   const [x, y, l, t] = getPointByIndex(index)
-    //   const shadowOffsetX = l * SHADOW_OFFSET
-    //   const shadowOffsetY = t * SHADOW_OFFSET
-    //   return (canvas.current as Canvas).addShape('circle', {
-    //     attrs: {
-    //       x,
-    //       y,
-    //       r: DOT_R,
-    //       fill: DOT_COLOR,
-    //       shadowColor: SHADOW_COLOR,
-    //       shadowOffsetX: -shadowOffsetX,
-    //       shadowOffsetY: -shadowOffsetY,
-    //       shadowBlur: SHADOW_BLUR
-    //     }
-    //   })
-    // })
     Array.from({ length: POINT_NUM }, (item, index: number) => {
       const [x, y, l, t] = getPointByIndex(index)
       const deg = ~~(index * (360 / POINT_NUM) + 210)
-      const dot = (canvas.current as Canvas).addShape('circle', {
-        attrs: {
-          x,
-          y,
+      const dot = new Circle({
+        style: {
+          cx: x,
+          cy: y,
           r: DOT_R,
           fill: DOT_COLOR
         }
       })
-      const line = (canvas.current as Canvas).addShape('line', {
-        attrs: {
+      const line = new Line({
+        style: {
           x1: x,
           y1: y,
           x2: x,
@@ -105,6 +89,8 @@ export default function SDot(props: SComponentProps) {
           stroke: `l(${deg}) 0.3:rgba(255,255,255,0) 1:${DOT_COLOR}`
         }
       })
+      canvas.current?.appendChild(dot)
+      canvas.current?.appendChild(line)
       sArr.current.push(dot)
       lArr.current.push(line)
     })

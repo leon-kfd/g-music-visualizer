@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import { Canvas, IShape } from '@antv/g-canvas';
-import { IElement } from "@antv/g-canvas/lib/types";
+import { Canvas, Image, Path, Circle } from '@antv/g';
+import { Renderer } from '@antv/g-canvas'
 import { line, curveCardinalClosed } from 'd3';
 import { getImageCircle } from '../utils/base';
 import { X, Y, R } from '../utils/constanst'
@@ -19,10 +19,10 @@ export default function SPathDot(props: SComponentProps) {
   
 
   const canvas = useRef<Canvas>()
-  const circle = useRef<IShape>()
+  const circle = useRef<Image>()
 
-  const sArr = useRef<IElement[]>([])
-  const fakePath = useRef<IElement>()
+  const sArr = useRef<Circle[]>([])
+  const fakePath = useRef<Path>()
 
   function getArray(arr: number[]) {
     return arr
@@ -45,12 +45,12 @@ export default function SPathDot(props: SComponentProps) {
         }
         return pre
       }, [])
-      const path = line().x((d) => d[0]).y((d) => d[1]).curve(curveCardinalClosed)(PointArr)
+      const path = line().x((d) => d[0]).y((d) => d[1]).curve(curveCardinalClosed)(PointArr) as string
       fakePath.current.attr('path', path)
       sArr.current.map((item,index) => {
         const { x, y } = (fakePath.current as any).getPoint(index / POINT_NUM)
-        item.attr('x', x)
-        item.attr('y', y)
+        item.attr('cx', x)
+        item.attr('cy', y)
       })
     }
   }, [
@@ -62,6 +62,7 @@ export default function SPathDot(props: SComponentProps) {
       container: 'SPathDot',
       width: 2 * X,
       height: 2 * Y,
+      renderer: new Renderer()
     });
 
     circle.current = getImageCircle(canvas.current, {
@@ -74,22 +75,23 @@ export default function SPathDot(props: SComponentProps) {
     const PointArr = Array.from({ length: POINT_NUM / PACE_NUM }, (item, index: number) => {
       return getPointByIndex(index * PACE_NUM)
     })
-    const path = line().x((d) => d[0]).y((d) => d[1]).curve(curveCardinalClosed)(PointArr as [number,number][])
-    fakePath.current = canvas.current.addShape('path', {
-      attrs: {
+    const path = line().x((d) => d[0]).y((d) => d[1]).curve(curveCardinalClosed)(PointArr as [number,number][]) as string
+    fakePath.current = new Path({
+      style: {
         lineWidth: 1,
         path
       }
     })
+    canvas.current?.appendChild(fakePath.current)
     sArr.current = Array.from({ length: POINT_NUM }, (item, index: number) => {
-      const { x, y } = (fakePath.current as any).getPoint(index / POINT_NUM)
+      const { x, y } = (fakePath.current as Path)?.getPoint(index / POINT_NUM)
       const [, , l, t] = getPointByIndex(index)
       const shadowOffsetX = l * SHADOW_OFFSET
       const shadowOffsetY = t * SHADOW_OFFSET
-      return (canvas.current as Canvas).addShape('circle', {
-        attrs: {
-          x,
-          y,
+      const circle = new Circle({
+        style: {
+          cx: x,
+          cy: y,
           r: DOT_R,
           fill: DOT_COLOR,
           shadowColor: SHADOW_COLOR,
@@ -98,6 +100,8 @@ export default function SPathDot(props: SComponentProps) {
           shadowBlur: SHADOW_BLUR
         }
       })
+      canvas.current?.appendChild(circle)
+      return circle
     })
   }, [])
 

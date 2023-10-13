@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { Canvas, IShape } from '@antv/g-canvas';
+import { Canvas, Image, Circle } from '@antv/g';
+import { Renderer } from '@antv/g-canvas'
 import { getImageCircle } from '../utils/base'
 import { X, Y, R } from '../utils/constanst'
 import useAudioImg from "@/hooks/useAudioImg";
@@ -13,9 +14,9 @@ export default function SPaticle(props: SComponentProps) {
   const POINT_CREATE_DELAY = 4000
 
   const canvas = useRef<Canvas>()
-  const circle = useRef<IShape>()
+  const circle = useRef<Image>()
 
-  const particleArr = useRef<IShape[]>([])
+  const particleArr = useRef<Circle[]>([])
   const particleStartArr = useRef<boolean[]>([])
   const particleActiveArr = useRef<number[]>([])
 
@@ -54,6 +55,7 @@ export default function SPaticle(props: SComponentProps) {
         container: 'SParticle',
         width: 2 * X,
         height: 2 * Y,
+        renderer: new Renderer()
       });
 
       circle.current = getImageCircle(canvas.current, {
