@@ -1,4 +1,5 @@
 import { Canvas, Circle, Image } from "@antv/g";
+import { DEFAULT_IMG } from '@/global'
 
 type ImageCircleConfig = {
   x: number;
@@ -34,12 +35,13 @@ export function getImageCircle(canvas: Canvas, { x, y, r, shadowColor }: ImageCi
           cy: y,
           r
         }
-      })
+      }),
+      img: DEFAULT_IMG
     }
   })
-  canvas.appendChild(circle)
-  canvas.appendChild(image)
-  const animation = image.animate([
+  canvas?.appendChild(circle)
+  canvas?.appendChild(image)
+  const animation = image?.animate([
     { transform: 'rotate(0)' }, 
     { transform: 'rotate(360deg)' }
   ], {
