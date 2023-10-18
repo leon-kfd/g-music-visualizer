@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import { Canvas, IShape } from '@antv/g-canvas';
+import { Canvas, Image, Path, Line } from '@antv/g';
+import { Renderer } from '@antv/g-canvas';
 import { formatToTransit, getCirclePath } from '../utils'
 import { line, curveCardinalClosed } from 'd3'
 import { getImageCircle } from '../utils/base';
@@ -13,10 +14,10 @@ export default function SPath(props: SComponentProps) {
   // const COLORS = ['#e9dcf7', '#cdd9f5', '#cdf5dd', '#f3dfbb']
 
   const canvas = useRef<Canvas>()
-  const circle = useRef<IShape>()
+  const circle = useRef<Image>()
 
-  const sPath = useRef<IShape>()
-  const lineArr = useRef<IShape[]>([])
+  const sPath = useRef<Path>()
+  const lineArr = useRef<Line[]>([])
 
   function getArray(arr: number[]) {
     let _arr: number[] = [];
@@ -51,7 +52,9 @@ export default function SPath(props: SComponentProps) {
         lineArr.current[index].attr('y2', point2[1])
       })
       const path = line().x((d: [number,number]) => d[0]).y((d: [number, number]) => d[1]).curve(curveCardinalClosed)(pathPointArr)
-      sPath.current?.attr('path', path)
+      if (path) {
+        sPath.current?.attr('path', path)
+      }
     }
   }, [
     props.data
@@ -62,6 +65,7 @@ export default function SPath(props: SComponentProps) {
       container: 'SPathDouble',
       width: 2 * X,
       height: 2 * Y,
+      renderer: new Renderer()
     });
 
     circle.current = getImageCircle(canvas.current, {
@@ -71,17 +75,18 @@ export default function SPath(props: SComponentProps) {
       shadowColor: COLOR
     })
 
-    sPath.current = canvas.current.addShape('path', {
-      attrs: {
+    sPath.current = new Path({
+      style: {
         stroke: COLOR,
         lineWidth: 1,
         path: getCirclePath(X, Y, R + OFFSET)
       }
     })
+    canvas.current.appendChild(sPath.current)
 
     lineArr.current = Array.from({length: POINT_NUM}, (item, index) => {
-      return (canvas.current as Canvas).addShape('line', {
-        attrs: {
+      const line = new Line({
+        style: {
           x1: X,
           y1: Y - R,
           x2: X,
@@ -90,6 +95,8 @@ export default function SPath(props: SComponentProps) {
           lineWidth: 1
         }
       })
+      canvas.current?.appendChild(line)
+      return line
     })
     
   }, [])

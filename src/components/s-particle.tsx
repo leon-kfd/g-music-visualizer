@@ -1,26 +1,30 @@
 import React, { useEffect, useRef } from 'react';
-import { Canvas, IShape } from '@antv/g-canvas';
+import { Canvas, Image, Circle, runtime } from '@antv/g';
+import { Renderer } from '@antv/g-canvas'
 import { getImageCircle } from '../utils/base'
 import { X, Y, R } from '../utils/constanst'
 import useAudioImg from "@/hooks/useAudioImg";
+
+runtime.enableDataset = true
 
 export default function SPaticle(props: SComponentProps) {
   const POINT_NUM = 64
   const PARTICLE_NUM = 12
   const OFFSET = 0
-  const POINT_MOVE_LENGTH = 18
-  const POINT_ACTIVE_MOVE_LENGTH = 48
+  const POINT_MOVE_LENGTH = 24
+  const POINT_ACTIVE_MOVE_LENGTH = 64
   const POINT_CREATE_DELAY = 4000
 
-  const canvas = useRef<Canvas>()
-  const circle = useRef<IShape>()
+  const DOT_R = 0.5
 
-  const particleArr = useRef<IShape[]>([])
+  const canvas = useRef<Canvas>()
+  const circle = useRef<Image>()
+
+  const particleArr = useRef<Circle[]>([])
   const particleStartArr = useRef<boolean[]>([])
-  const particleActiveArr = useRef<number[]>([])
 
   const currentActiveIndex = useRef<number>(-1)
-  const timer = useRef<number>()
+  const timer = useRef<ReturnType<typeof setTimeout>>()
 
   const isPlaying = useRef(false)
 
@@ -41,7 +45,7 @@ export default function SPaticle(props: SComponentProps) {
 
           // currentActiveIndex.current = ~~(Math.random() * POINT_NUM)
           currentActiveIndex.current = result
-          timer.current = 0
+          timer.current = undefined
           clearTimeout(timer.current)
         }, 300)
       }
@@ -54,6 +58,7 @@ export default function SPaticle(props: SComponentProps) {
         container: 'SParticle',
         width: 2 * X,
         height: 2 * Y,
+        renderer: new Renderer() as any,
       });
 
       circle.current = getImageCircle(canvas.current, {
@@ -73,49 +78,21 @@ export default function SPaticle(props: SComponentProps) {
           const x = X + l * r
           const y = Y + t * r
 
-          const particleShape = (canvas.current as Canvas).addShape('circle', {
-            attrs: {
-              x,
-              y,
-              r: 0.8,
+          const particleShape = new Circle({
+            style: {
+              cx: x,
+              cy: y,
+              r: DOT_R,
               fill: '#fff',
               opacity: 0,
-              // ⚠开启阴影会掉帧
-              // shadowColor: '#fcc8d9',
-              // shadowBlur: 1
+              transformOrigin: `${-l * R + DOT_R}px ${-t * R + DOT_R}px`
             }
           })
-          particleShape.animate((ratio: number) => {
-            const deg = index1 * (360 / POINT_NUM) - 150 + Math.sin(ratio * 20) * 4;
-            const l = Math.cos(deg * Math.PI / 180)
-            const t = Math.sin(deg * Math.PI / 180)
-
-            const _index = POINT_NUM * index1 + index2
-            if (particleActiveArr.current[_index]) {
-              if (ratio < 0.02) {
-                particleActiveArr.current[_index] = 
-                  index1 >= currentActiveIndex.current - 1 && index1 <= currentActiveIndex.current + 1 
-                  ? POINT_ACTIVE_MOVE_LENGTH 
-                  : POINT_MOVE_LENGTH
-              } else if (ratio > 0.98) {
-                particleActiveArr.current[_index] = POINT_MOVE_LENGTH
-              }
-            }
-            const offset = particleActiveArr.current[_index] || POINT_MOVE_LENGTH
-
-            return {
-              x: x + l * ratio * offset,
-              y: y + t * ratio * offset,
-              opacity: 1 - ratio
-            }
-          }, {
-            duration: POINT_CREATE_DELAY,
-            repeat: true,
-            easing: 'easeSinInOut'
-          })
+          particleShape.dataset.deg = deg
+          particleShape.dataset.index1 = index1
+          canvas.current?.appendChild(particleShape)
           particleArr.current.push(particleShape)
           particleStartArr.current.push(false)
-          particleActiveArr.current.push(POINT_MOVE_LENGTH)
         })
       })
     }
@@ -123,11 +100,11 @@ export default function SPaticle(props: SComponentProps) {
     if (props.isPlaying) {
       particleArr.current.map((item,index) => {
         if (particleStartArr.current[index]) {
-          item.resumeAnimate()
+          item.getAnimations()?.[0]?.play()
         } else {
           setTimeout(() => {
             if (!isPlaying.current) return
-            item.resumeAnimate()
+            runParticleAnimation(item)
             particleStartArr.current[index] = true 
           }, Math.random() * POINT_CREATE_DELAY)
         }
@@ -135,7 +112,7 @@ export default function SPaticle(props: SComponentProps) {
     } else {
       setTimeout(() => {
         particleArr.current.map(item => {
-          item.pauseAnimate()
+          item.getAnimations()?.[0]?.pause()
         })
       })
     }
@@ -146,6 +123,38 @@ export default function SPaticle(props: SComponentProps) {
   }, [props.isPlaying])
 
   useAudioImg(canvas, circle, props.isPlaying, props.audioImg)
+
+  function runParticleAnimation(shape: Circle) {
+    const deg = ~~shape.dataset.deg
+    const index1 = ~~shape.dataset.index1
+    const l = Math.cos(deg * Math.PI / 180)
+    const t = Math.sin(deg * Math.PI / 180)
+    const isActive = index1 >= currentActiveIndex.current - 1 && index1 <= currentActiveIndex.current + 1
+    const length = isActive ? POINT_ACTIVE_MOVE_LENGTH : POINT_MOVE_LENGTH
+    const arr = Array.from({ length: 4 }, (item, index) => {
+      const offset = 0.2 * (index + 1)
+      const randomDeg = deg + Math.sin(offset * 20) * 4
+      const l = Math.cos(randomDeg * Math.PI / 180)
+      const t = Math.sin(randomDeg * Math.PI / 180)
+      return { transform: `translate(${l * length * offset }, ${t * length * offset})`, offset }
+    })
+    const animation = shape.animate(
+      [
+        { transform: 'translate(0, 0)', opacity: 1 },
+        ...arr,
+        { transform: `translate(${l * length}, ${t * length})`, opacity: 0 }
+      ],
+      {
+        duration: POINT_CREATE_DELAY
+      }
+    )
+    if (animation) {
+      animation.onfinish = () => {
+        animation.cancel() // release memory??
+        runParticleAnimation(shape)
+      }
+    }
+  }
 
   return (
     <div id="SParticle" className="s-canvas-wrapper"></div>

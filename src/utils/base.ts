@@ -1,7 +1,5 @@
-import { Canvas } from "@antv/g-canvas";
-import { ext } from '@antv/matrix-util';
-
-const { transform } = ext
+import { Canvas, Circle, Image } from "@antv/g";
+import { DEFAULT_IMG } from '@/global'
 
 type ImageCircleConfig = {
   x: number;
@@ -14,53 +12,46 @@ export function getImageCircle(canvas: Canvas, { x, y, r, shadowColor }: ImageCi
     shadowColor,
     shadowBlur: 16
   } : {}
-  canvas.addShape('circle', {
-    attrs: {
-      x,
-      y,
+  const circle = new Circle({
+    style: {
+      cx: x,
+      cy: y,
       r,
       fill: '#262626',
       ...shadowConfig
     }
   })
-  const shape = canvas.addShape('image', {
+  const image = new Image({
     id: 'audioImg',
-    attrs: {
+    style: {
       x: x - r,
       y: y - r,
       width: 2 * r,
       height: 2 * r,
-      // img: `https://source.unsplash.com/random/${2 * r}x${2 * r}?Nature`
-      // img: `https://howdz.deno.dev/unsplash/random?keyword=Nature&${2 * r}x${2 * r}`
+      transformOrigin: 'center',
+      clipPath: new Circle({
+        style: {
+          cx: x,
+          cy: y,
+          r
+        }
+      }),
+      img: DEFAULT_IMG
     }
   })
-  shape.setClip({
-    type: 'circle',
-    attrs: {
-      x,
-      y,
-      r
-    }
+  canvas?.appendChild(circle)
+  canvas?.appendChild(image)
+  const animation = image?.animate([
+    { transform: 'rotate(0)' }, 
+    { transform: 'rotate(360deg)' }
+  ], {
+    duration: 12000,
+    iterations: Infinity
   })
 
-  // 旋转动画
-  const matrix = shape.getMatrix()
-  const radian = 2 * Math.PI
-  shape.animate((ratio: number) => {
-    return {
-      matrix: transform(matrix, [
-        ['t', -x, -y],
-        ['r', radian * ratio],
-        ['t', x, y],
-      ])
-    }
-  }, {
-    duration: 10000,
-    repeat: true
-  })
   setTimeout(() => {
-    shape.pauseAnimate()
+    animation?.pause()
   })
 
-  return shape
+  return image
 }

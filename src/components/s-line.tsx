@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import { Canvas } from '@antv/g-canvas';
-import { IElement, IShape } from "@antv/g-canvas/lib/types";
+import { Canvas, Image, Rect } from '@antv/g';
+import { Renderer } from '@antv/g-canvas';
 // import { formatToTransit } from '../utils'
 import { getImageCircle } from '../utils/base'
 import { X, Y, R } from '../utils/constanst'
@@ -13,8 +13,8 @@ export default function SLine(props: SComponentProps) {
   const RECT_COLOR = '#e9dcf7'
 
   const canvas = useRef<Canvas>()
-  const circle = useRef<IShape>()
-  const sArr = useRef<IElement[]>([])
+  const circle = useRef<Image>()
+  const sArr = useRef<Rect[]>([])
 
   function getArray(arr: number[]) {
     const filterArr = arr.reduce((prev: number[], curr: number, index: number) => {
@@ -43,6 +43,7 @@ export default function SLine(props: SComponentProps) {
       container: 'SLine',
       width: 2 * X,
       height: 2 * Y,
+      renderer: new Renderer()
     });
 
     circle.current = getImageCircle(canvas.current, {
@@ -57,8 +58,9 @@ export default function SLine(props: SComponentProps) {
       const l = Math.cos(deg * Math.PI / 180)
       const t = Math.sin(deg * Math.PI / 180)
       const r = R + OFFSET
-      return (canvas.current as Canvas).addShape('rect', {
-        attrs: {
+
+      const rect = new Rect({
+        style: {
           width: RECT_WIDTH,
           height: RECT_WIDTH,
           radius: RECT_WIDTH / 2,
@@ -66,7 +68,11 @@ export default function SLine(props: SComponentProps) {
           y: Y + t * r - RECT_WIDTH / 2,
           fill: RECT_COLOR
         }
-      }).rotateAtPoint(X + l * r, Y + t * r, (deg - 90) * Math.PI / 180)
+      })
+      rect.setOrigin(X + l * r, Y + t * r)
+      rect.rotate(deg - 90)
+      canvas.current?.appendChild(rect)
+      return rect
     })
   }, [])
 

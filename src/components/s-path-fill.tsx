@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import { Canvas, IShape } from '@antv/g-canvas';
+import { Canvas, Image, Path } from '@antv/g';
+import { Renderer } from '@antv/g-canvas';
 import { formatToTransit, addColorOpacity } from '../utils'
 import { line, curveCardinalClosed } from 'd3'
 import { getImageCircle } from '../utils/base';
@@ -9,13 +10,12 @@ import useAudioImg from "@/hooks/useAudioImg";
 export default function SLine(props: SComponentProps) {
   const POINT_NUM = 64
   const POINT_OFFSET = 60
-  // const COLORS = ['#cdf5dd', '#e8fdc8', '#dafcf0', '#f3f8c9']
-  const COLORS = ['#81D8F2', '#67A1E0', '#5263C2', '#74E1A5']
+  const COLORS = ['#90E3F5', '#5C8AF4', '#BEABF0', '#E1A2E1']
 
   const canvas = useRef<Canvas>()
-  const circle = useRef<IShape>()
+  const circle = useRef<Image>()
 
-  const SPathFillArr = useRef<IShape[]>([])
+  const SPathFillArr = useRef<Path[]>([])
 
   function getArray(arr: number[]) {
     let _arr: number[] = [];
@@ -43,7 +43,9 @@ export default function SLine(props: SComponentProps) {
       })
       pathArr.map((item,index) => {
         const path = line().x((d: [number,number]) => d[0]).y((d: [number, number]) => d[1]).curve(curveCardinalClosed)(item)
-        SPathFillArr.current[index].attr('path', path)
+        if (path) {
+          SPathFillArr.current[index].attr('path', path)
+        }
       })
     }
   }, [
@@ -55,28 +57,34 @@ export default function SLine(props: SComponentProps) {
       container: 'SPathFill',
       width: 2 * X,
       height: 2 * Y,
+      renderer: new Renderer()
     });
-
-    circle.current = getImageCircle(canvas.current, {
-      x: X,
-      y: Y,
-      r: R,
-      shadowColor: '#ffffff'
-    }).setZIndex(2)
 
     const PointArr = Array.from({ length: POINT_NUM / 4 }, (item, index: number) => {
       return getPointByIndex(index * 4)
     })
     const path = line().x((d: [number,number]) => d[0]).y((d: [number, number]) => d[1]).curve(curveCardinalClosed)(PointArr)
     Array.from({ length: 4 }, (item, index: number) => {
-      SPathFillArr.current.push((canvas.current as Canvas).addShape('path', {
-        attrs: {
-          stroke: COLORS[index],
-          lineWidth: 1,
-          path,
-          fill: addColorOpacity(COLORS[index], 0.2)
-        }
-      }).setZIndex(1))
+      if (path) {
+        const pathEl = new Path({
+          style: {
+            stroke: COLORS[index],
+            lineWidth: 2,
+            path,
+            fill: 'rgba(255,255,255,0.2)'
+            // fill: addColorOpacity(COLORS[index], 0.3)
+          }
+        })
+        canvas.current?.appendChild(pathEl)
+        SPathFillArr.current.push(pathEl)
+      }
+    })
+
+    circle.current = getImageCircle(canvas.current, {
+      x: X,
+      y: Y,
+      r: R,
+      shadowColor: '#ffffff'
     })
   }, [])
 

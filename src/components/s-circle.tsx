@@ -1,24 +1,27 @@
 import React, { useEffect, useRef } from "react";
-import { Canvas, IShape } from '@antv/g-canvas';
-import { getCirclePath } from '../utils'
+import { Canvas, Image, Circle, Group, IAnimation } from '@antv/g';
+import { Renderer } from '@antv/g-canvas';
 import { getImageCircle } from '../utils/base';
 import { X, Y, R } from '../utils/constanst'
 import useAudioImg from "@/hooks/useAudioImg";
 
+type ICircleItem = {
+  circle: Circle,
+  dot: Circle
+}
+
 export default function SCircle(props: SComponentProps) {
   const LINE_COLOR = '#fff'
-  const DOT_COLOR = '#e9dcf7'
+  const DOT_COLOR = '#fa7'
   const DOT_R = 5
   const CIRCLE_NUM = 3
   const CIRCLE_DELAY = 2000
-  const CIRCLE_SCALE_OFFSET = 80
+  const CIRCLE_SCALE_RARIO = 2
 
   const canvas = useRef<Canvas>()
-  const circle = useRef<IShape>()
+  const circle = useRef<Image>()
 
-  const circleArr = useRef<IShape[]>([])
-  const circleDotArr = useRef<IShape[]>([])
-  const circleDotDegArr = useRef<number[]>([])
+  const circleArr = useRef<ICircleItem[]>([])
   const circleArrStart = useRef<boolean[]>([])
 
   const realtimeData = useRef<number[]>([])
@@ -50,6 +53,7 @@ export default function SCircle(props: SComponentProps) {
         container: 'SCircle',
         width: 2 * X,
         height: 2 * Y,
+        renderer: new Renderer()
       });
 
       circle.current = getImageCircle(canvas.current, {
@@ -60,80 +64,57 @@ export default function SCircle(props: SComponentProps) {
       })
 
       const addCircle = () => {
-        return (canvas.current as Canvas).addShape('circle', {
-          attrs: {
+        const circle = new Circle({
+          style: {
+            cx: X,
+            cy: Y,
             stroke: LINE_COLOR,
             lineWidth: 2,
-            opacity: 0,
-            x: X,
-            y: Y,
+            opacity: 1,
             r: R
-            //path: getCirclePath(X, Y, R),
           }
         })
-      };
-      const addCircleDot = () => {
-        return (canvas.current as Canvas).addShape('circle', {
-          attrs: {
-            x: X,
-            y: Y - R,
+        const circleDot = new Circle({
+          style: {
             r: DOT_R,
             fill: LINE_COLOR,
             shadowColor: DOT_COLOR,
             shadowBlur: DOT_R,
-            opacity: 0
-          }
+            opacity: 0,
+          },
         })
-      }
+        canvas.current?.appendChild(circle)
+        canvas.current?.appendChild(circleDot)
+        return [circle, circleDot]
+      };
       const animateOption = {
-        duration: 6000,
-        easing: 'easeLinear',
-        repeat: true
+        duration: CIRCLE_DELAY * CIRCLE_NUM,
+        iterations: Infinity
       }
       Array.from({ length: CIRCLE_NUM }, (item, index) => {
         circleArrStart.current.push(false)
-        // circle
-        circleArr.current.push(addCircle())
-        circleArr.current[index].animate((ratio: number) => {
-          return {
-            r: R + ratio * CIRCLE_SCALE_OFFSET,
-            // path: getCirclePath(X, Y, R + ratio * 80),
-            opacity: ratio > 0.02 && ratio < 0.9 ? 0.8 - ratio * 0.8 : 0
-          }
-        }, animateOption)
-        // circle-dot
-        circleDotArr.current.push(addCircleDot())
-        circleDotDegArr.current.push(0)
-        circleDotArr.current[index].animate((ratio: number) => {
-          if (props.data && ratio < 0.05 && !circleDotDegArr.current[index]) {
-            circleDotDegArr.current[index] = pickStartPoint()
-          } else if (ratio > 0.9) {
-            circleDotDegArr.current[index] = 0
-          }
-          const deg = circleDotDegArr.current[index] + ratio * 360 - 180
-          const l = Math.cos(deg * Math.PI / 180)
-          const t = Math.sin(deg * Math.PI / 180)
-          const r = R + ratio * CIRCLE_SCALE_OFFSET
-          return {
-            x: X + l * r,
-            y: Y + t * r,
-            r: DOT_R * (1 - ratio / 2),
-            opacity: ratio > 0.05 && ratio < 0.9 ? 0.8 - ratio * 0.8 : 0
-          }
-        }, animateOption)
+        const [circle, dot] = addCircle()
+        circleArr.current.push({ circle, dot })
+        circleArr.current[index].circle.animate(
+          [
+            { transform: 'scale(1)', opacity: 0.8 },
+            { transform: `scale(${CIRCLE_SCALE_RARIO})`, opacity: 0 }
+          ],
+          animateOption
+        )
       })
     }
 
     if (props.isPlaying) {
       for(let i = 0; i < circleArr.current.length; i++) {
         if (circleArrStart.current[i]) {
-          circleArr.current[i].resumeAnimate()
-          circleDotArr.current[i].resumeAnimate()
+          circleArr.current[i].circle.getAnimations()?.[0]?.play()
+          circleArr.current[i].dot.getAnimations()?.[0]?.play()
         } else {
           setTimeout(() => {
             if (!isPlaying.current) return
-            circleArr.current[i].resumeAnimate()
-            circleDotArr.current[i].resumeAnimate()
+            circleArr.current[i].circle.getAnimations()?.[0]?.play()
+            runDotAnimation(circleArr.current[i].dot)
             circleArrStart.current[i] = true
           }, i * CIRCLE_DELAY)
         }
@@ -141,8 +122,8 @@ export default function SCircle(props: SComponentProps) {
     } else {
       setTimeout(() => {
         for(let i = 0; i < circleArr.current.length; i++) {
-          circleArr.current[i].pauseAnimate()
-          circleDotArr.current[i].pauseAnimate()
+          circleArr.current[i].circle.getAnimations()?.[0]?.pause()
+          circleArr.current[i].dot.getAnimations()?.[0]?.pause()
         }
       })
     }
@@ -153,6 +134,31 @@ export default function SCircle(props: SComponentProps) {
   }, [props.isPlaying])
 
   useAudioImg(canvas, circle, props.isPlaying, props.audioImg)
+
+  function runDotAnimation(shape: Circle) {
+    const deg = -135 + pickStartPoint()
+    const l = Math.cos(deg * Math.PI / 180)
+    const t = Math.sin(deg * Math.PI / 180)
+    shape.setAttribute('cx', X + l * R)
+    shape.setAttribute('cy', Y + t * R)
+    shape.setAttribute('transformOrigin', `${-l * R + DOT_R}px ${-t * R + DOT_R}px`);
+    const animation = shape.animate(
+      [
+        { transform: 'rotate(0) translate(0, 0)', opacity: 0, offset: 0.01 },
+        { opacity: 0.9, offset: 0.02 },
+        { transform: `rotate(360deg) translate(${l * R}, ${t * R})`, opacity: 0 }
+      ],
+      {
+        duration: CIRCLE_DELAY * CIRCLE_NUM
+      }
+    )
+    if (animation) {
+      animation.onfinish = () => {
+        animation.cancel() // release memory??
+        runDotAnimation(shape)
+      }
+    }
+  }
 
   return (
     <div id="SCircle" className="s-canvas-wrapper"></div>
