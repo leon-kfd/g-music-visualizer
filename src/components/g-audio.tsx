@@ -12,8 +12,6 @@ import { apiURL, DEFAULT_IMG } from '@/global'
 
 export const MusicVisualizerCtx = new MusicVisualizer()
 
-// const exampleList = [SLine, SPathDouble, SPath, SPathFill, SCircle, SPaticle, SDot]
-
 const exampleList = [SLine, SPathDouble, SPath, SPathFill, SDot, SCircle, SPaticle ]
 
 export default function GAudio() {

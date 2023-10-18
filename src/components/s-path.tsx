@@ -10,7 +10,7 @@ import useAudioImg from "@/hooks/useAudioImg";
 export default function SPath(props: SComponentProps) {
   const POINT_NUM = 64
   const OFFSET = 4
-  const POINT_OFFSET = 30
+  const POINT_OFFSET = 42
   const COLORS = ['#e9dcf7', '#cdd9f5', '#cdf5dd', '#f3dfbb']
   // const COLORS = ['#4E4BD7', '#BB4BD7', '#4BD773', '#D7544B']
 

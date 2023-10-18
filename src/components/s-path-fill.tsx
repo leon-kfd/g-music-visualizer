@@ -10,8 +10,7 @@ import useAudioImg from "@/hooks/useAudioImg";
 export default function SLine(props: SComponentProps) {
   const POINT_NUM = 64
   const POINT_OFFSET = 60
-  // const COLORS = ['#cdf5dd', '#e8fdc8', '#dafcf0', '#f3f8c9']
-  const COLORS = ['#81D8F2', '#67A1E0', '#5263C2', '#74E1A5']
+  const COLORS = ['#90E3F5', '#5C8AF4', '#BEABF0', '#E1A2E1']
 
   const canvas = useRef<Canvas>()
   const circle = useRef<Image>()
@@ -70,9 +69,10 @@ export default function SLine(props: SComponentProps) {
         const pathEl = new Path({
           style: {
             stroke: COLORS[index],
-            lineWidth: 1,
+            lineWidth: 2,
             path,
-            fill: addColorOpacity(COLORS[index], 0.2)
+            fill: 'rgba(255,255,255,0.2)'
+            // fill: addColorOpacity(COLORS[index], 0.3)
           }
         })
         canvas.current?.appendChild(pathEl)
