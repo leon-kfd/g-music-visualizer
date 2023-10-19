@@ -64,8 +64,8 @@ export default function SLine(props: SComponentProps) {
           width: RECT_WIDTH,
           height: RECT_WIDTH,
           radius: RECT_WIDTH / 2,
-          x: X + l * r - RECT_WIDTH / 2,
-          y: Y + t * r - RECT_WIDTH / 2,
+          x: X + l * r,
+          y: Y + t * r,
           fill: RECT_COLOR
         }
       })

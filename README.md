@@ -21,4 +21,4 @@ Online Demo: [Click Here](https://leon-kfd.github.io/g-music-visualizer)
 
 ## License
 
-`MIT` © [leon-kfd](https://github.com/leon-kfd) 2021
+`MIT` © [leon-kfd](https://github.com/leon-kfd) 2023
