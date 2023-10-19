@@ -8,11 +8,12 @@ import SCircle from './s-circle'
 import SPathDouble from './s-path-double'
 import SDot from "./s-dot";
 import SPaticle from "./s-particle";
+import SCircleMultiple from './s-circle-multiple';
 import { apiURL, DEFAULT_IMG } from '@/global'
 
 export const MusicVisualizerCtx = new MusicVisualizer()
 
-const exampleList = [SLine, SPathDouble, SPath, SPathFill, SDot, SCircle, SPaticle ]
+const exampleList = [SLine, SPathDouble, SPath, SPathFill, SDot, SPaticle, SCircle, SCircleMultiple]
 
 export default function GAudio() {
   const audio = useRef<HTMLAudioElement>(null)
