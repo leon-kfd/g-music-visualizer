@@ -87,21 +87,10 @@ export default function SCircle(props: SComponentProps) {
         canvas.current?.appendChild(circleDot)
         return [circle, circleDot]
       };
-      const animateOption = {
-        duration: CIRCLE_DELAY * CIRCLE_NUM,
-        iterations: Infinity
-      }
       Array.from({ length: CIRCLE_NUM }, (item, index) => {
         circleArrStart.current.push(false)
         const [circle, dot] = addCircle()
         circleArr.current.push({ circle, dot })
-        circleArr.current[index].circle.animate(
-          [
-            { transform: 'scale(1)', opacity: 0.8 },
-            { transform: `scale(${CIRCLE_SCALE_RARIO})`, opacity: 0 }
-          ],
-          animateOption
-        )
       })
     }
 
@@ -113,7 +102,7 @@ export default function SCircle(props: SComponentProps) {
         } else {
           setTimeout(() => {
             if (!isPlaying.current) return
-            circleArr.current[i].circle.getAnimations()?.[0]?.play()
+            runCircleAnimation(circleArr.current[i].circle)
             runDotAnimation(circleArr.current[i].dot)
             circleArrStart.current[i] = true
           }, i * CIRCLE_DELAY)
@@ -134,6 +123,24 @@ export default function SCircle(props: SComponentProps) {
   }, [props.isPlaying])
 
   useAudioImg(canvas, circle, props.isPlaying, props.audioImg)
+
+  function runCircleAnimation(shape: Circle) {
+    const animation = shape.animate(
+      [
+        { transform: 'scale(1)', opacity: 0.8 },
+        { transform: `scale(${CIRCLE_SCALE_RARIO})`, opacity: 0 }
+      ],
+      {
+        duration: CIRCLE_DELAY * CIRCLE_NUM
+      }
+    )
+    if (animation) {
+      animation.onfinish = () => {
+        animation.cancel() // release memory??
+        runCircleAnimation(shape)
+      }
+    }
+  }
 
   function runDotAnimation(shape: Circle) {
     const deg = -135 + pickStartPoint()
