@@ -144,7 +144,6 @@ export default function SCircle(props: SComponentProps) {
     )
     if (animation) {
       animation.onfinish = () => {
-        console.log('an finish', new Date())
         animation.cancel() // release memory??
         runCircleAnimation(shape)
       }
