@@ -3,30 +3,29 @@ import { Canvas, Image, Circle, runtime } from '@antv/g';
 import { Renderer } from '@antv/g-canvas'
 import { getImageCircle } from '../utils/base'
 import { X, Y, R } from '../utils/constanst'
-import useAudioImg from "@/hooks/useAudioImg";
+import useAudioImg from "@/hooks/useAudioImg"
+import useDocumentVisibility from '@/hooks/useDocumenVisiblity'
+import Timer from '@/utils/timer'
 
 runtime.enableDataset = true
 
 export default function SPaticle(props: SComponentProps) {
   const POINT_NUM = 64
-  const PARTICLE_NUM = 12
+  const PARTICLE_NUM = 10
   const OFFSET = 0
   const POINT_MOVE_LENGTH = 24
   const POINT_ACTIVE_MOVE_LENGTH = 64
   const POINT_CREATE_DELAY = 4000
 
-  const DOT_R = 0.5
+  const DOT_R = 0.64
 
   const canvas = useRef<Canvas>()
   const circle = useRef<Image>()
 
-  const particleArr = useRef<Circle[]>([])
-  const particleStartArr = useRef<boolean[]>([])
+  const particleArr = useRef<Array<Circle & { _timer?: Timer }>>([])
 
   const currentActiveIndex = useRef<number>(-1)
   const timer = useRef<ReturnType<typeof setTimeout>>()
-
-  const isPlaying = useRef(false)
 
   useEffect(() => {
     if (props.isPlaying && props.data && props.data.length) {
@@ -92,37 +91,36 @@ export default function SPaticle(props: SComponentProps) {
           particleShape.dataset.index1 = index1
           canvas.current?.appendChild(particleShape)
           particleArr.current.push(particleShape)
-          particleStartArr.current.push(false)
         })
       })
     }
 
     if (props.isPlaying) {
-      particleArr.current.map((item,index) => {
-        if (particleStartArr.current[index]) {
-          item.getAnimations()?.[0]?.play()
-        } else {
-          setTimeout(() => {
-            if (!isPlaying.current) return
-            runParticleAnimation(item)
-            particleStartArr.current[index] = true 
-          }, Math.random() * POINT_CREATE_DELAY)
-        }
-      })
+      togglePlay(true)
     } else {
-      setTimeout(() => {
-        particleArr.current.map(item => {
-          item.getAnimations()?.[0]?.pause()
-        })
-      })
+      togglePlay(false)
     }
   }, [props.isPlaying])
 
-  useEffect(() => {
-    isPlaying.current = props.isPlaying
-  }, [props.isPlaying])
-
   useAudioImg(canvas, circle, props.isPlaying, props.audioImg)
+
+  function togglePlay(toPlay = true) {
+    const key = toPlay ? 'play' : 'pause'
+    for(let i = 0; i < particleArr.current.length; i++) {
+      const particleAn = particleArr.current[i].getAnimations()?.[0]
+      if (particleAn) {
+        particleAn[key]()
+      } else {
+        if (particleArr.current[i]._timer) {
+          particleArr.current[i]._timer?.[key]()
+        } else if (toPlay) {
+          particleArr.current[i]._timer = new Timer(() => {
+            runParticleAnimation(particleArr.current[i])
+          }, Math.random() * POINT_CREATE_DELAY)
+        }
+      }
+    }
+  }
 
   function runParticleAnimation(shape: Circle) {
     const deg = ~~shape.dataset.deg
@@ -155,6 +153,13 @@ export default function SPaticle(props: SComponentProps) {
       }
     }
   }
+
+  const documentVisibility = useDocumentVisibility()
+  useEffect(() => {
+    if (props.isPlaying) {
+      togglePlay(documentVisibility)
+    }
+  }, [documentVisibility])
 
   return (
     <div id="SParticle" className="s-canvas-wrapper"></div>

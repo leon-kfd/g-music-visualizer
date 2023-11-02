@@ -1,13 +1,15 @@
 import React, { useEffect, useRef } from "react";
-import { Canvas, Image, Circle, Group, IAnimation } from '@antv/g';
+import { Canvas, Image, Circle } from '@antv/g';
 import { Renderer } from '@antv/g-canvas';
 import { getImageCircle } from '../utils/base';
 import { X, Y, R } from '../utils/constanst'
 import useAudioImg from "@/hooks/useAudioImg";
+import useDocumentVisibility from '@/hooks/useDocumenVisiblity'
+import Timer from '@/utils/timer'
 
 type ICircleItem = {
-  circle: Circle,
-  dot: Circle
+  circle: Circle & { _timer?: Timer },
+  dot: Circle & { _timer?: Timer }
 }
 
 export default function SCircle(props: SComponentProps) {
@@ -22,11 +24,8 @@ export default function SCircle(props: SComponentProps) {
   const circle = useRef<Image>()
 
   const circleArr = useRef<ICircleItem[]>([])
-  const circleArrStart = useRef<boolean[]>([])
 
   const realtimeData = useRef<number[]>([])
-
-  const isPlaying = useRef(false)
 
   // 拾取初始角度
   const pickStartPoint = () => {
@@ -88,41 +87,50 @@ export default function SCircle(props: SComponentProps) {
         return [circle, circleDot]
       };
       Array.from({ length: CIRCLE_NUM }, (item, index) => {
-        circleArrStart.current.push(false)
         const [circle, dot] = addCircle()
         circleArr.current.push({ circle, dot })
       })
     }
 
     if (props.isPlaying) {
-      for(let i = 0; i < circleArr.current.length; i++) {
-        if (circleArrStart.current[i]) {
-          circleArr.current[i].circle.getAnimations()?.[0]?.play()
-          circleArr.current[i].dot.getAnimations()?.[0]?.play()
-        } else {
-          setTimeout(() => {
-            if (!isPlaying.current) return
-            runCircleAnimation(circleArr.current[i].circle)
-            runDotAnimation(circleArr.current[i].dot)
-            circleArrStart.current[i] = true
-          }, i * CIRCLE_DELAY)
-        }
-      }
+      togglePlay(true)
     } else {
-      setTimeout(() => {
-        for(let i = 0; i < circleArr.current.length; i++) {
-          circleArr.current[i].circle.getAnimations()?.[0]?.pause()
-          circleArr.current[i].dot.getAnimations()?.[0]?.pause()
-        }
-      })
+      togglePlay(false)
     }
   }, [props.isPlaying])
 
-  useEffect(() => {
-    isPlaying.current = props.isPlaying
-  }, [props.isPlaying])
-
   useAudioImg(canvas, circle, props.isPlaying, props.audioImg)
+
+  function togglePlay(toPlay = true) {
+    const key = toPlay ? 'play' : 'pause'
+    for(let i = 0; i < circleArr.current.length; i++) {
+      const circleAn = circleArr.current[i].circle.getAnimations()?.[0]
+      if (circleAn) {
+        circleAn[key]()
+      } else {
+        if (circleArr.current[i].circle._timer) {
+          circleArr.current[i].circle._timer?.[key]()
+        } else if (toPlay) {
+          circleArr.current[i].circle._timer = new Timer(() => {
+            runCircleAnimation(circleArr.current[i].circle)
+          }, i * CIRCLE_DELAY)
+        }
+      }
+
+      const dotAn = circleArr.current[i].dot.getAnimations()?.[0]
+      if (dotAn) {
+        dotAn[key]()
+      } else {
+        if (circleArr.current[i].dot._timer) {
+          circleArr.current[i].dot._timer?.[key]()
+        } else if (toPlay) {
+          circleArr.current[i].dot._timer = new Timer(() => {
+            runDotAnimation(circleArr.current[i].dot)
+          }, i * CIRCLE_DELAY)
+        }
+      }
+    }
+  }
 
   function runCircleAnimation(shape: Circle) {
     const animation = shape.animate(
@@ -136,6 +144,7 @@ export default function SCircle(props: SComponentProps) {
     )
     if (animation) {
       animation.onfinish = () => {
+        console.log('an finish', new Date())
         animation.cancel() // release memory??
         runCircleAnimation(shape)
       }
@@ -166,6 +175,13 @@ export default function SCircle(props: SComponentProps) {
       }
     }
   }
+
+  const documentVisibility = useDocumentVisibility()
+  useEffect(() => {
+    if (props.isPlaying) {
+      togglePlay(documentVisibility)
+    }
+  }, [documentVisibility])
 
   return (
     <div id="SCircle" className="s-canvas-wrapper"></div>

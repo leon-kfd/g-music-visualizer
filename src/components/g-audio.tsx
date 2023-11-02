@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { MusicVisualizer } from '../plugins/MusicVisualizer'
 import style from './g-audio.module.scss'
 import SLine from './s-line'
@@ -10,12 +10,15 @@ import SDot from "./s-dot";
 import SPaticle from "./s-particle";
 import SCircleMultiple from './s-circle-multiple';
 import { apiURL, DEFAULT_IMG } from '@/global'
+// import { GlobalState } from "@/store";
 
 export const MusicVisualizerCtx = new MusicVisualizer()
 
 const exampleList = [SLine, SPathDouble, SPath, SPathFill, SDot, SPaticle, SCircle, SCircleMultiple]
 
 export default function GAudio() {
+  // const { setState: setGlobalState } = useContext(GlobalState)
+
   const audio = useRef<HTMLAudioElement>(null)
   useEffect(() => {
     MusicVisualizerCtx.setAudioEl(audio.current as HTMLAudioElement)
@@ -80,6 +83,7 @@ export default function GAudio() {
         musicName = `${name} - ${artist}`
         musicURL = url
         posterPic = picURL.split('?')[0]
+        // setGlobalState({ mainColor: `#${~~(Math.random() * 1000000)}`})
       } else {
         const transferTarget = encodeURIComponent(`https://api.wqwlkj.cn/wqwlapi/wyy_random.php?type=json`)
         const res = await fetch(`${apiURL}/api/transfer?target=${transferTarget}`, { headers: { 'content-type': 'application/json; charset=utf-8' } })
