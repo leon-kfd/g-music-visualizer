@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { MusicVisualizer } from '../plugins/MusicVisualizer'
 import style from './g-audio.module.scss'
 import SLine from './s-line'
@@ -82,7 +82,7 @@ export default function GAudio() {
         console.log('picURL', picURL)
         musicName = `${name} - ${artist}`
         musicURL = url
-        posterPic = picURL.split('?')[0]
+        posterPic = picURL.split('?')[0] + `?param=400y400`
         // setGlobalState({ mainColor: `#${~~(Math.random() * 1000000)}`})
       } else {
         const transferTarget = encodeURIComponent(`https://api.wqwlkj.cn/wqwlapi/wyy_random.php?type=json`)
