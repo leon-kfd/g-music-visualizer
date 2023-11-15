@@ -106,3 +106,19 @@ ul, li {
   width: 300px;
   margin: 0 12px;
 }
+
+.lyric-wrapper {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  .lyric-content {
+    background: #fff linear-gradient(to right, #7592f1, #7592f1) no-repeat 0 0;
+    background-size: 0 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 24px;
+    font-family: LXGW WenKai Screen;
+    filter: drop-shadow(0 0 1px #262626);
+    white-space: nowrap;
+  }
+}

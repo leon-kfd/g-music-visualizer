@@ -7,14 +7,25 @@ import SPathFill from './s-path-fill'
 import SCircle from './s-circle'
 import SPathDouble from './s-path-double'
 import SDot from "./s-dot";
-import SPaticle from "./s-particle";
 import SCircleMultiple from './s-circle-multiple';
-import { apiURL, DEFAULT_IMG } from '@/global'
+// import SPaticle from "./s-particle";
+import { DEFAULT_IMG } from '@/global'
+import lrcParser from "@/plugins/LrcParser";
+import Lyric, { LyricRef } from './lyric'
 // import { GlobalState } from "@/store";
 
 export const MusicVisualizerCtx = new MusicVisualizer()
 
-const exampleList = [SLine, SPathDouble, SPath, SPathFill, SDot, SPaticle, SCircle, SCircleMultiple]
+const exampleList = [
+  SLine, 
+  SPathDouble, 
+  SPath, 
+  SPathFill, 
+  SDot, 
+  SCircle, 
+  SCircleMultiple,
+  // SPaticle, // 性能不行, 先屏蔽
+]
 
 export default function GAudio() {
   // const { setState: setGlobalState } = useContext(GlobalState)
@@ -31,7 +42,10 @@ export default function GAudio() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [playList, setPlayList] = useState<any[]>([])
 
+  const [lrcContent, setLrcContent] = useState<ScriptItem[]>([])
+
   const hiddenFileInput = useRef<HTMLInputElement>(null)
+  const lyricCtx = useRef<LyricRef>(null)
 
   let lastTime: number
   let raf = useRef<number>()
@@ -76,22 +90,15 @@ export default function GAudio() {
       let posterPic = ''
       if (playList && playList.length > 0) {
         const randomIdx = ~~[Math.random() * playList.length]
-        const { name, url, artist, pic } = playList[randomIdx]
-        console.log('playList[randomIdx]', playList[randomIdx])
+        const { name, url, artist, pic, lrc } = playList[randomIdx]
+        loadLRC(lrc)
         const { url: picURL } = await fetch(pic, { method: 'HEAD' })
-        console.log('picURL', picURL)
         musicName = `${name} - ${artist}`
         musicURL = url
         posterPic = picURL.split('?')[0] + `?param=400y400`
         // setGlobalState({ mainColor: `#${~~(Math.random() * 1000000)}`})
       } else {
-        const transferTarget = encodeURIComponent(`https://api.wqwlkj.cn/wqwlapi/wyy_random.php?type=json`)
-        const res = await fetch(`${apiURL}/api/transfer?target=${transferTarget}`, { headers: { 'content-type': 'application/json; charset=utf-8' } })
-        const { data } = await res.json()
-        const { name, url, artistsname, picurl } = data
-        musicName = `${name} - ${artistsname}`
-        musicURL = url
-        posterPic = picurl
+        throw new Error('Can not get play list')
       }
       setMusicName(musicName)
       setAudioURL(musicURL)
@@ -116,6 +123,28 @@ export default function GAudio() {
     setAudioURL(url)
   }
 
+  function handleAudioTimeUpdate() {
+    const audioCurrentTime = audio.current?.currentTime
+    if (typeof audioCurrentTime !== 'undefined') {
+      lyricCtx.current?.onUpdateTime(audioCurrentTime)
+    }
+  }
+
+  async function loadLRC(url: string) {
+    try {
+      const lrcText = await (await fetch(url)).text()
+      const lrc = lrcParser(lrcText)
+      if (lrc.scripts && lrc.scripts.length > 0) {
+        setLrcContent(lrc.scripts)
+      } else {
+        setLrcContent([])
+      }
+    } catch (e) {
+      console.error(e)
+      setLrcContent([])
+    }
+  }
+
   return (
     <>
       <main className={style.page}>
@@ -126,7 +155,10 @@ export default function GAudio() {
           <input type="file" style={{display: 'none'}} ref={hiddenFileInput} onChange={handleFileChange} />
         </div>
         <div className={style.audioWrapper}>
-          <audio controls onPlay={play} onPause={pause} ref={audio} src={audioURL} crossOrigin="anonymous"></audio>
+          <audio controls onPlay={play} onPause={pause} ref={audio} src={audioURL} crossOrigin="anonymous" onTimeUpdate={handleAudioTimeUpdate}></audio>
+          <div className="lyric-wrapper">
+            <Lyric isPlaying={isPlaying} lrcContent={lrcContent} ref={lyricCtx} />
+          </div>
         </div>
         <div className={style.exampleWrapper}>
           {

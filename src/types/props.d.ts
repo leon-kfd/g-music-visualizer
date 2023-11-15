@@ -3,3 +3,8 @@ interface SComponentProps {
   data: number[];
   audioImg?: string;
 }
+
+interface LrcComponentProps {
+  isPlaying: boolean;
+  lrcContent: ScriptItem[];
+}
