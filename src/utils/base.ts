@@ -1,4 +1,4 @@
-import { Canvas, Circle, Image } from "@antv/g";
+import { Canvas, Circle, Image } from "@antv/g-lite";
 import { DEFAULT_IMG } from '@/global'
 
 type ImageCircleConfig = {

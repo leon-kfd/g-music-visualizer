@@ -1,4 +1,4 @@
-import { Canvas, Image } from "@antv/g";
+import { Canvas, Image } from "@antv/g-lite";
 import { useEffect } from "react";
 
 export default function(canvas: React.MutableRefObject<Canvas | undefined>, circle: React.MutableRefObject<Image | undefined>, isPlaying: boolean, audioImg: string | undefined) {

@@ -13,6 +13,7 @@ Online Demo: [Click Here](https://leon-kfd.github.io/g-music-visualizer)
 + 项目基于`vite` + `react` + `ts`搭建
 + 基于`AudioContext`的`decodeAudioData`API读取音频数据
 + 当前粒子效果Example（`s-particle`）导致掉帧严重，把粒子数降低了很多，正寻找优化方案
++ 使用原生Element.animate()实现了逐字歌词，但因获取到的歌词是逐行歌词，逐字效果为线性动画模拟
 
 ## Run the project
 

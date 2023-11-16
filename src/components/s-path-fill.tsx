@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Canvas, Image, Path } from '@antv/g';
+import { Canvas, Image, Path } from '@antv/g-lite';
 import { Renderer } from '@antv/g-canvas';
 import { formatToTransit, addColorOpacity } from '../utils'
 import { line, curveCardinalClosed } from 'd3'

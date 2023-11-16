@@ -22,24 +22,26 @@ export default forwardRef<LyricRef, LrcComponentProps>((props, ref) => {
       }
       if (~activeIndex) {
         const target = props.lrcContent[activeIndex]
-        console.log('need run animation', activeIndex, target.text, target.end - target.start)
-        runLrcAnimation(target.text, target.end - target.start)
+        const duration = target.end - target.start
+        const startPercent = (val - target.start) / duration * 100
+        runLrcAnimation(target.text, duration, startPercent)
       } else {
         runLrcAnimation('', 0)
       }
     }
   }
 
-  function runLrcAnimation(text: string, duration: number) {
+  function runLrcAnimation(text: string, duration: number, startPercent: number = 0) {
     if (!lyricEl.current) {
       return
     }
     lyricEl.current.innerHTML = text
     an = lyricEl.current.animate([
-      { 'backgroundSize': '0 100%' },
+      { 'backgroundSize': `${startPercent}% 100%` },
       { 'backgroundSize': '100% 100%' }
     ], {
-      duration: duration * 1000
+      duration: duration * 1000,
+      easing: 'cubic-bezier(0.34, 0.08, 0.41, 0.82)'
     })
   }
 

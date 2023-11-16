@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Canvas, Image, Circle, Line } from '@antv/g';
+import { Canvas, Image, Circle, Line } from '@antv/g-lite';
 import { Renderer } from '@antv/g-canvas'
 // import { formatToTransit } from '../utils'
 import { getImageCircle } from '../utils/base';

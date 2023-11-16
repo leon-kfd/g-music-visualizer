@@ -8,7 +8,7 @@ import SCircle from './s-circle'
 import SPathDouble from './s-path-double'
 import SDot from "./s-dot";
 import SCircleMultiple from './s-circle-multiple';
-// import SPaticle from "./s-particle";
+import SPaticle from "./s-particle";
 import { DEFAULT_IMG } from '@/global'
 import lrcParser from "@/plugins/LrcParser";
 import Lyric, { LyricRef } from './lyric'
@@ -24,7 +24,7 @@ const exampleList = [
   SDot, 
   SCircle, 
   SCircleMultiple,
-  // SPaticle, // 性能不行, 先屏蔽
+  SPaticle, // 性能不行, 先屏蔽
 ]
 
 export default function GAudio() {

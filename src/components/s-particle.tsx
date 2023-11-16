@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Canvas, Image, Circle, runtime } from '@antv/g';
+import { Canvas, Image, Circle } from '@antv/g-lite';
 import { Renderer } from '@antv/g-canvas'
 import { getImageCircle } from '../utils/base'
 import { X, Y, R } from '../utils/constanst'
@@ -7,13 +7,11 @@ import useAudioImg from "@/hooks/useAudioImg"
 import useDocumentVisibility from '@/hooks/useDocumenVisiblity'
 import Timer from '@/utils/timer'
 
-runtime.enableDataset = true
-
 export default function SPaticle(props: SComponentProps) {
-  const POINT_NUM = 64
-  const PARTICLE_NUM = 10
+  const POINT_NUM = 48
+  const PARTICLE_NUM = 8
   const OFFSET = 0
-  const POINT_MOVE_LENGTH = 24
+  const POINT_MOVE_LENGTH = 20
   const POINT_ACTIVE_MOVE_LENGTH = 64
   const POINT_CREATE_DELAY = 4000
 
@@ -131,7 +129,7 @@ export default function SPaticle(props: SComponentProps) {
     const length = isActive ? POINT_ACTIVE_MOVE_LENGTH : POINT_MOVE_LENGTH
     const arr = Array.from({ length: 4 }, (item, index) => {
       const offset = 0.2 * (index + 1)
-      const randomDeg = deg + Math.sin(offset * 20) * 4
+      const randomDeg = deg + Math.sin(offset * 20) * 6
       const l = Math.cos(randomDeg * Math.PI / 180)
       const t = Math.sin(randomDeg * Math.PI / 180)
       return { transform: `translate(${l * length * offset }, ${t * length * offset})`, offset }
