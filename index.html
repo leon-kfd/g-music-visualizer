@@ -6,33 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="referrer" content="no-referrer" />
     <title>G Music Visualizer</title>
+<script src="https://cdn.staticfile.org/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdn.staticfile.org/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/r17/Stats.min.js"></script>
     <style>
       #fps > div {
         right: 0;
         left: auto !important;
       }
     </style>
-    <script type="module" crossorigin src="./assets/index-b3104fb5.js"></script>
-    <link rel="stylesheet" href="./assets/index-e88ce151.css">
+    <script type="module" crossorigin src="./assets/index-49970ddd.js"></script>
+    <link rel="stylesheet" href="./assets/index-d1099598.css">
   </head>
   <body>
     <div id="root"></div>
     <div id="fps"></div>
     
-    <script>
-      (function(){
-        var script = document.createElement('script');
-        script.onload = function(){
-          var stats = new Stats();
-          document.querySelector('#fps').appendChild(stats.dom);
-          requestAnimationFrame(function loop(){
-            stats.update();
-            requestAnimationFrame(loop)
-          });
-        };
-        script.src = '//cdn.jsdelivr.net/npm/stats.js@0.17.0/build/stats.min.js';
-        document.head.appendChild(script);
-      })();
-    </script>
   </body>
 </html>
