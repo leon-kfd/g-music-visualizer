@@ -17,10 +17,10 @@ jobs:
         uses: actions/setup-node@v2
 
       - name: Install dependencies
-        run: npm install
+        run: yarn
 
       - name: Build Demo
-        run: npm run build
+        run: yarn build
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@3.7.1
